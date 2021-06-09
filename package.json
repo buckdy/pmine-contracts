@@ -1,0 +1,33 @@
+{
+  "name": "polkamine-contract",
+  "version": "1.0.0",
+  "description": "Polkamine Contract",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run compile",
+    "compile": "npx hardhat compile",
+    "test": "npx hradhat test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Polkamine-Network/Polkamine-Contract.git"
+  },
+  "author": "0xPilot",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Polkamine-Network/Polkamine-Contract/issues"
+  },
+  "homepage": "https://github.com/Polkamine-Network/Polkamine-Contract#readme",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^4.1.0",
+    "chai": "^4.3.4",
+    "ethereum-waffle": "^3.3.0",
+    "ethers": "^5.3.0",
+    "hardhat": "^2.3.0"
+  },
+  "dependencies": {
+    "dotenv": "^10.0.0"
+  }
+}
