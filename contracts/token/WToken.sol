@@ -5,9 +5,9 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /**
- * @notice pToken Contract
+ * @notice wToken Contract
  */
-contract PToken is ERC20, AccessControl {
+contract WToken is ERC20, AccessControl {
     /*** Events ***/
     event Mint(address indexed to, uint256 amount);
     event Burn(address indexed from, uint256 amount);

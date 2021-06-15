@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run compile",
     "compile": "npx hardhat compile",
-    "test": "npx hradhat test"
+    "test": "npx hardhat test"
   },
   "repository": {
     "type": "git",

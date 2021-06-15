@@ -1,5 +1,5 @@
 module.exports = {
-    ...require("./unitUtils"),
-    ...require("./timeUtils"),
-    ...require("./constants")
-}
+  ...require("./unitUtils"),
+  ...require("./timeUtils"),
+  ...require("./constants"),
+};

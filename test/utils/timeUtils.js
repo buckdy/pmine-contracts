@@ -6,7 +6,9 @@ const increaseTime = async (sec) => {
 };
 
 const getTimeStamp = async () => {
-  const blockTimestamp = (await hre.network.provider.send("eth_getBlockByNumber", ["0x0", false])).timestamp;
+  const blockTimestamp = (
+    await hre.network.provider.send("eth_getBlockByNumber", ["0x0", false])
+  ).timestamp;
   return parseInt(blockTimestamp.slice(2), 16);
 };
 
@@ -22,5 +24,5 @@ module.exports = {
   increaseTime,
   getTimeStamp,
   getSnapShot,
-  revertEvm
-}
+  revertEvm,
+};
