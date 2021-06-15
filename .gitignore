@@ -1,0 +1,11 @@
+node_modules
+package-lock.json
+package.lock
+yarn.lock
+#Hardhat files
+cache
+artifacts
+.idea
+.env
+/.DS_Store
+.openzeppelin
