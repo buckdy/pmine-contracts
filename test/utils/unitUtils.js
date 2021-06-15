@@ -19,5 +19,5 @@ const usdc = (amount) => {
 module.exports = {
   ether,
   gWei,
-  usdc
-}
+  usdc,
+};
