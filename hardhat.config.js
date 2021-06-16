@@ -3,6 +3,8 @@ const path = require("path");
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-ethers");
 require("@openzeppelin/hardhat-upgrades");
+require("hardhat-gas-reporter");
+require("hardhat-abi-exporter");
 require("solidity-coverage");
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -16,9 +18,7 @@ task("accounts", "Prints the list of accounts", async () => {
 });
 
 // REQUIRED TO ENSURE METADATA IS SAVED IN DEPLOYMENTS (because solidity-coverage disable it otherwise)
-const {
-  TASK_COMPILE_GET_COMPILER_INPUT,
-} = require("hardhat/builtin-tasks/task-names");
+const { TASK_COMPILE_GET_COMPILER_INPUT } = require("hardhat/builtin-tasks/task-names");
 task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, bre, runSuper) => {
   const input = await runSuper();
   input.settings.metadata.useLiteralContent = bre.network.name !== "coverage";
@@ -40,6 +40,10 @@ const accounts = mnemonic
 
 module.exports = {
   defaultNetwork: "hardhat",
+  gasReporter: {
+    showTimeSpent: true,
+    currency: "USD",
+  },
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
@@ -97,5 +101,11 @@ module.exports = {
   },
   mocha: {
     timeout: 50000,
+  },
+  abiExporter: {
+    path: "./abi",
+    clear: true,
+    flat: true,
+    spacing: 2,
   },
 };

@@ -105,7 +105,7 @@ describe("PToken", () => {
     it("Should not burn another user's tokens by non burner role owner", async () => {
       await pBTCM.connect(alice).mint(alice.address, MINT_AMOUNT);
       await expect(pBTCM.connect(bob).burnFrom(alice.address, BURN_AMOUNT))
-        .to.be.revertedWith("Token: burn amount exceeds allowance");
+        .to.be.revertedWith("PToken: exceeds allowance");
     });
 
     it("Should burn another user's tokens by burner role owner", async () => {

@@ -12,13 +12,13 @@ contract PToken is ERC20Upgradeable, AccessControlUpgradeable {
     event Mint(address indexed to, uint256 amount);
     event Burn(address indexed from, uint256 amount);
 
-    /*** Constants ***/
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
+  /*** Constants ***/
+  bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+  bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
 
-    /*** Storage Properties ***/
+  /*** Storage Properties ***/
 
-    /*** Contract Logic Starts Here */
+  /*** Contract Logic Starts Here */
 
     function initialize(string memory name, string memory symbol) public initializer {
         __ERC20_init_unchained(name, symbol);
@@ -29,28 +29,28 @@ contract PToken is ERC20Upgradeable, AccessControlUpgradeable {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    /**
+  /**
      @notice Mint the token
      @dev caller must have the minter role
      @param to address to receive the token minted
      @param amount token amount to be minted
      */
-    function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
-        _mint(to, amount);
+  function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
+    _mint(to, amount);
 
-        emit Mint(to, amount);
-    }
+    emit Mint(to, amount);
+  }
 
-    /**
-     * @notice Burn `amount` tokens from the caller.
-     */
-    function burn(uint256 amount) public virtual {
-        _burn(msg.sender, amount);
+  /**
+   * @notice Burn `amount` tokens from the caller.
+   */
+  function burn(uint256 amount) public virtual {
+    _burn(msg.sender, amount);
 
-        emit Burn(address(this), amount);
-    }
+    emit Burn(address(this), amount);
+  }
 
-    /**
+  /**
      @notice Burn `amount` tokens from `account`, deducting from the caller's allowance
      @dev caller must have the burner role and have allowance for `from`'s tokens of at least `amount`.
      @param from address from which the token will be burned
@@ -64,11 +64,11 @@ contract PToken is ERC20Upgradeable, AccessControlUpgradeable {
         uint256 currentAllowance = allowance(from, msg.sender);
         require(
             currentAllowance >= amount,
-            "Token: burn amount exceeds allowance"
+            "PToken: exceeds allowance"
         );
         _approve(from, msg.sender, currentAllowance - amount);
         _burn(from, amount);
 
-        emit Burn(from, amount);
-    }
+    emit Burn(from, amount);
+  }
 }

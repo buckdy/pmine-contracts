@@ -105,7 +105,7 @@ describe("WToken", () => {
     it("Should not burn another user's tokens by non burner role owner", async () => {
       await wBTCM.connect(alice).mint(alice.address, MINT_AMOUNT);
       await expect(wBTCM.connect(bob).burnFrom(alice.address, BURN_AMOUNT))
-        .to.be.revertedWith("Token: burn amount exceeds allowance");
+        .to.be.revertedWith("WToken: exceeds allowance");
     });
 
     it("Should burn another user's tokens by burner role owner", async () => {
