@@ -11,3 +11,7 @@ artifacts
 .env
 /.DS_Store
 .openzeppelin
+
+#Coverage
+coverage
+coverage.sol
