@@ -1,2 +1,5 @@
-npm run prettier
-npm run lint:sol
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+yarn run prettier
+yarn run lint:sol

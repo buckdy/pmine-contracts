@@ -10,10 +10,8 @@ const ONE = One;
 const TWO = Two;
 const THREE = BigNumber.from(3);
 const ZERO = Zero;
-const MAX_INT_256 =
-  "0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
-const MIN_INT_256 =
-  "-0x8000000000000000000000000000000000000000000000000000000000000000";
+const MAX_INT_256 = "0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+const MIN_INT_256 = "-0x8000000000000000000000000000000000000000000000000000000000000000";
 const ONE_DAY_IN_SECONDS = BigNumber.from(60 * 60 * 24);
 const ONE_HOUR_IN_SECONDS = BigNumber.from(60 * 60);
 const ONE_YEAR_IN_SECONDS = BigNumber.from(31557600);
