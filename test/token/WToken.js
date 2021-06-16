@@ -22,43 +22,44 @@ describe("WToken", () => {
       expect(await wBTCM.name()).to.be.equal("wBTCM");
       expect(await wBTCM.symbol()).to.be.equal("wBTCM");
     });
-  
+
     it("Should assign the default admin to the deployer", async () => {
       expect(await wBTCM.hasRole(wBTCM.DEFAULT_ADMIN_ROLE(), deployer.address)).to.equal(true);
     });
-  
+
     it("Should get the role admin", async () => {
       let roleAdmin = await wBTCM.DEFAULT_ADMIN_ROLE();
       expect(await wBTCM.getRoleAdmin(MINTER_ROLE)).to.be.equal(roleAdmin);
-    })
-  
+    });
+
     it("Should not grant the role by non role admin", async () => {
       await expect(wBTCM.connect(bob).grantRole(MINTER_ROLE, alice.address)).to.be.reverted;
     });
-  
+
     it("Should grant the role to another user by role admin", async () => {
       expect(await wBTCM.hasRole(MINTER_ROLE, alice.address)).to.equal(false);
       await wBTCM.grantRole(MINTER_ROLE, alice.address);
       expect(await wBTCM.hasRole(MINTER_ROLE, alice.address)).to.equal(true);
     });
-  
+
     it("Should not revoke the role by non role admin", async () => {
       await expect(wBTCM.connect(bob).revokeRole(MINTER_ROLE, alice.address)).to.be.reverted;
     });
-  
+
     it("Should revoke the role to another user by role admin", async () => {
       await wBTCM.grantRole(MINTER_ROLE, alice.address);
       expect(await wBTCM.hasRole(MINTER_ROLE, alice.address)).to.equal(true);
       await wBTCM.revokeRole(MINTER_ROLE, alice.address);
       expect(await wBTCM.hasRole(MINTER_ROLE, alice.address)).to.equal(false);
     });
-  
+
     it("Should not renounce the role by non role owner", async () => {
       await wBTCM.grantRole(BURNER_ROLE, alice.address);
-      await expect(wBTCM.renounceRole(BURNER_ROLE, alice.address))
-        .to.be.revertedWith("AccessControl: can only renounce roles for self");
+      await expect(wBTCM.renounceRole(BURNER_ROLE, alice.address)).to.be.revertedWith(
+        "AccessControl: can only renounce roles for self",
+      );
     });
-  
+
     it("Should renounce the role by role owner", async () => {
       await wBTCM.grantRole(BURNER_ROLE, alice.address);
       expect(await wBTCM.connect(alice).hasRole(BURNER_ROLE, alice.address)).to.equal(true);
@@ -104,8 +105,9 @@ describe("WToken", () => {
 
     it("Should not burn another user's tokens by non burner role owner", async () => {
       await wBTCM.connect(alice).mint(alice.address, MINT_AMOUNT);
-      await expect(wBTCM.connect(bob).burnFrom(alice.address, BURN_AMOUNT))
-        .to.be.revertedWith("WToken: exceeds allowance");
+      await expect(wBTCM.connect(bob).burnFrom(alice.address, BURN_AMOUNT)).to.be.revertedWith(
+        "WToken: exceeds allowance",
+      );
     });
 
     it("Should burn another user's tokens by burner role owner", async () => {
@@ -115,5 +117,5 @@ describe("WToken", () => {
       let restAmount = MINT_AMOUNT - BURN_AMOUNT;
       expect(await wBTCM.balanceOf(alice.address)).to.equal(restAmount);
     });
-  }) 
+  });
 });
