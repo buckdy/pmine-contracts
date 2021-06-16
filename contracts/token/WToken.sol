@@ -1,13 +1,13 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
 /**
  * @notice wToken Contract
  */
-contract WToken is ERC20, AccessControl {
+contract WToken is ERC20Upgradeable, AccessControlUpgradeable {
     /*** Events ***/
     event Mint(address indexed to, uint256 amount);
     event Burn(address indexed from, uint256 amount);
@@ -20,7 +20,10 @@ contract WToken is ERC20, AccessControl {
 
     /*** Contract Logic Starts Here */
 
-    constructor(string memory name, string memory symbol) ERC20(name, symbol) {
+    function initialize(string memory name, string memory symbol) public initializer {
+        __ERC20_init_unchained(name, symbol);
+        __AccessControl_init_unchained();
+
         // Grant the contract deployer the default admin role: it will be able
         // to grant and revoke any roles
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -61,7 +64,7 @@ contract WToken is ERC20, AccessControl {
         uint256 currentAllowance = allowance(from, msg.sender);
         require(
             currentAllowance >= amount,
-            "Hashrate Token: burn amount exceeds allowance"
+            "Token: burn amount exceeds allowance"
         );
         _approve(from, msg.sender, currentAllowance - amount);
         _burn(from, amount);
