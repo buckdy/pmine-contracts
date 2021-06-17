@@ -14,4 +14,4 @@ artifacts
 
 #Coverage
 coverage
-coverage.sol
+coverage.json

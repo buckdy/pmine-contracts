@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-ethers");
+require("@openzeppelin/hardhat-upgrades");
 require("hardhat-gas-reporter");
 require("hardhat-abi-exporter");
 require("solidity-coverage");

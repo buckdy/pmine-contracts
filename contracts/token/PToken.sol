@@ -1,13 +1,13 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
 /**
  * @notice pToken Contract
  */
-contract PToken is ERC20, AccessControl {
+contract PToken is ERC20Upgradeable, AccessControlUpgradeable {
   /*** Events ***/
   event Mint(address indexed to, uint256 amount);
   event Burn(address indexed from, uint256 amount);
@@ -20,18 +20,21 @@ contract PToken is ERC20, AccessControl {
 
   /*** Contract Logic Starts Here */
 
-  constructor(string memory name, string memory symbol) ERC20(name, symbol) {
+  function initialize(string memory name, string memory symbol) public initializer {
+    __ERC20_init_unchained(name, symbol);
+    __AccessControl_init_unchained();
+
     // Grant the contract deployer the default admin role: it will be able
     // to grant and revoke any roles
     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
   }
 
   /**
-     @notice Mint the token
-     @dev caller must have the minter role
-     @param to address to receive the token minted
-     @param amount token amount to be minted
-     */
+   * @notice Mint the token
+   * @dev caller must have the minter role
+   * @param to address to receive the token minted
+   * @param amount token amount to be minted
+   */
   function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
     _mint(to, amount);
 
@@ -48,11 +51,11 @@ contract PToken is ERC20, AccessControl {
   }
 
   /**
-     @notice Burn `amount` tokens from `account`, deducting from the caller's allowance
-     @dev caller must have the burner role and have allowance for `from`'s tokens of at least `amount`.
-     @param from address from which the token will be burned
-     @param amount token amount to be burned
-     */
+   * @notice Burn `amount` tokens from `account`, deducting from the caller's allowance
+   * @dev caller must have the burner role and have allowance for `from`'s tokens of at least `amount`.
+   * @param from address from which the token will be burned
+   * @param amount token amount to be burned
+   */
   function burnFrom(address from, uint256 amount) public virtual onlyRole(BURNER_ROLE) {
     uint256 currentAllowance = allowance(from, msg.sender);
     require(currentAllowance >= amount, "PToken: exceeds allowance");
