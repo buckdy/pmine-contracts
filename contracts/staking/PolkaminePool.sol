@@ -19,7 +19,7 @@ contract PolkaminePool is IPolkaminePool, ReentrancyGuardUpgradeable {
 
   /*** Contract Logic Starts Here */
 
-  constructor(address _pToken) {
+  function initialize(address _pToken) public initializer {
     __ReentrancyGuard_init();
 
     pToken = _pToken;
