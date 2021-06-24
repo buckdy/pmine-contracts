@@ -5,4 +5,6 @@ abstract contract IPolkaminePool {
   function stake(uint256 _amount) external virtual;
 
   function unstake(uint256 _amount) external virtual;
+
+  function wToken() external virtual returns (address);
 }
