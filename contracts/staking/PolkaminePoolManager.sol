@@ -8,14 +8,14 @@ import "../interfaces/IPolkamineAddressManager.sol";
 
 contract PolkaminePoolManager is IPolkaminePoolManager, Initializable {
   /*** Events ***/
-  event AddPool(uint256 pid, address pool);
-  event RemovePool(uint256 pid, address pool);
+  event AddPool(uint256 pid, address indexed pool);
+  event RemovePool(uint256 pid, address indexed pool);
 
   /*** Constants ***/
 
   /*** Storage Properties ***/
   address public addressManager;
-  address[] public pools;
+  address[] public override pools;
   mapping(address => bool) public isPool;
 
   /*** Contract Logic Starts Here */

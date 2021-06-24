@@ -5,4 +5,6 @@ interface IPolkaminePool {
   function stake(uint256 _amount) external;
 
   function unstake(uint256 _amount) external;
+
+  function wToken() external returns (address);
 }

@@ -55,6 +55,11 @@
         "internalType": "address",
         "name": "_pToken",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_wToken",
+        "type": "address"
       }
     ],
     "name": "initialize",
@@ -115,6 +120,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "wToken",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

@@ -1,8 +1,12 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-interface IRewardOracle {
-  function getReward(uint256 _pid, address _beneficiary) external returns (uint256);
+interface IPolkamineRewardOracle {
+  function claimableReward(uint256 _pid, address _beneficiary) external returns (uint256);
 
-  function setPoolRewards(uint256[] calldata _pids, uint256[] calldata _amounts) external;
+  function onClaimReward(
+    uint256 _pid,
+    address _beneficiary,
+    uint256 _amount
+  ) external;
 }
