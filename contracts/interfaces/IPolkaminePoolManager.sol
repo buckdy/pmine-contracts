@@ -7,4 +7,6 @@ abstract contract IPolkaminePoolManager {
   function removePool(uint256 _pid) external virtual returns (address);
 
   function allPools() external virtual returns (address[] memory);
+
+  function pools(uint256 _pid) external virtual returns (address);
 }

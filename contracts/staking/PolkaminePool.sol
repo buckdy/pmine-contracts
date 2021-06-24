@@ -15,14 +15,16 @@ contract PolkaminePool is IPolkaminePool, ReentrancyGuardUpgradeable {
 
   /*** Storage Properties ***/
   address public pToken;
+  address public override wToken;
   mapping(address => uint256) public userStakes;
 
   /*** Contract Logic Starts Here */
 
-  function initialize(address _pToken) public initializer {
+  function initialize(address _pToken, address _wToken) public initializer {
     __ReentrancyGuard_init();
 
     pToken = _pToken;
+    wToken = _wToken;
   }
 
   function stake(uint256 _amount) public override {

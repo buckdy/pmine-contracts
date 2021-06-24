@@ -2,9 +2,9 @@
   {
     "inputs": [
       {
-        "internalType": "address",
+        "internalType": "uint256",
         "name": "_pid",
-        "type": "address"
+        "type": "uint256"
       },
       {
         "internalType": "address",

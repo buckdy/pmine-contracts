@@ -2,20 +2,18 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "../interfaces/IPolkaminePoolManager.sol";
 
 contract PolkaminePoolManager is IPolkaminePoolManager, OwnableUpgradeable {
   /*** Events ***/
-  event AddPool(uint256 pid, address pool);
-  event RemovePool(uint256 pid, address pool);
+  event AddPool(uint256 pid, address indexed pool);
+  event RemovePool(uint256 pid, address indexed pool);
 
   /*** Constants ***/
 
   /*** Storage Properties ***/
-  address[] public pools;
+  address[] public override pools;
   mapping(address => bool) public isPool;
 
   /*** Contract Logic Starts Here */
