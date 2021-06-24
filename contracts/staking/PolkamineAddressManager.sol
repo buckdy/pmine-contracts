@@ -41,7 +41,7 @@ contract PolkamineAddressManager is IPolkamineAddressManager, OwnableUpgradeable
   function setRewardOracle(address _rewardOracle) external onlyOwner {
     rewardOracle = _rewardOracle;
   }
-  
+
   function setRewardDistributor(address _rewardDistributor) external onlyOwner {
     rewardDistributor = _rewardDistributor;
   }
