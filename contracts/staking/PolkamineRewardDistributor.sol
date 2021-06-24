@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "../interfaces/IPolkamineRewardDistributor.sol";
@@ -9,8 +10,9 @@ import "../interfaces/IPolkamineRewardOracle.sol";
 import "../interfaces/IPolkaminePoolManager.sol";
 import "../interfaces/IPolkaminePool.sol";
 
-contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGuardUpgradeable {
+contract PolkamineRewardDistributor is IPolkamineRewardDistributor, OwnableUpgradeable, ReentrancyGuardUpgradeable {
   /*** Events ***/
+  event Deposit(address indexed from, address indexed rewardToken, uint256 amount);
   event Claim(address indexed beneficiary, address indexed rewardToken, uint256 amount);
 
   /*** Constants ***/
@@ -22,10 +24,17 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
   /*** Contract Logic Starts Here */
 
   function initialize(address _rewardOracle, address _poolManager) public initializer {
+    __Ownable_init();
     __ReentrancyGuard_init();
 
     rewardOracle = _rewardOracle;
     poolManager = _poolManager;
+  }
+
+  function deposit(address _rewardToken, uint256 _amount) external override onlyOwner {
+    require(IERC20Upgradeable(_rewardToken).transferFrom(msg.sender, address(this), _amount), "Transfer failure");
+
+    emit Deposit(msg.sender, _rewardToken, _amount);
   }
 
   function claim(
