@@ -109,47 +109,11 @@
         "internalType": "address",
         "name": "_addressManager",
         "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_rewardOracle",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_poolManager",
-        "type": "address"
       }
     ],
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "poolManager",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "rewardOracle",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   }
 ]

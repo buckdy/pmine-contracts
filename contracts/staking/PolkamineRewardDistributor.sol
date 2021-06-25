@@ -24,8 +24,6 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
 
   /*** Storage Properties ***/
   address public addressManager;
-  address public rewardOracle;
-  address public poolManager;
 
   /*** Contract Logic Starts Here */
 
@@ -34,16 +32,10 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     _;
   }
 
-  function initialize(
-    address _addressManager,
-    address _rewardOracle,
-    address _poolManager
-  ) public initializer {
+  function initialize(address _addressManager) public initializer {
     __ReentrancyGuard_init();
 
     addressManager = _addressManager;
-    rewardOracle = _rewardOracle;
-    poolManager = _poolManager;
   }
 
   /**
@@ -68,6 +60,9 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     address _beneficiary,
     uint256 _amount
   ) external override nonReentrant {
+    address rewardOracle = IPolkamineAddressManager(addressManager).rewardOracleContract();
+    address poolManager = IPolkamineAddressManager(addressManager).poolManagerContract();
+
     uint256 remainingReward = IPolkamineRewardOracle(rewardOracle).claimableReward(_pid, _beneficiary);
     require(_amount <= remainingReward, "Exceeds claim amount");
 
