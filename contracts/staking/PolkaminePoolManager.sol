@@ -1,11 +1,12 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IPolkaminePoolManager.sol";
+import "../interfaces/IPolkamineAddressManager.sol";
 
-contract PolkaminePoolManager is IPolkaminePoolManager, OwnableUpgradeable {
+contract PolkaminePoolManager is IPolkaminePoolManager, Initializable {
   /*** Events ***/
   event AddPool(uint256 pid, address indexed pool);
   event RemovePool(uint256 pid, address indexed pool);
@@ -13,16 +14,23 @@ contract PolkaminePoolManager is IPolkaminePoolManager, OwnableUpgradeable {
   /*** Constants ***/
 
   /*** Storage Properties ***/
+  address public addressManager;
   address[] public override pools;
   mapping(address => bool) public isPool;
 
   /*** Contract Logic Starts Here */
 
-  function initialize() public initializer {
-    __Ownable_init();
+  modifier onlyManager() {
+    require(msg.sender == IPolkamineAddressManager(addressManager).manager(), "not polkamine manager");
+
+    _;
   }
 
-  function addPool(address _pool) external override onlyOwner returns (uint256 pid) {
+  function initialize(address _addressManager) public initializer {
+    addressManager = _addressManager;
+  }
+
+  function addPool(address _pool) external override onlyManager returns (uint256 pid) {
     require(!isPool[_pool], "Pool already exists");
 
     // add pool
@@ -34,7 +42,7 @@ contract PolkaminePoolManager is IPolkaminePoolManager, OwnableUpgradeable {
     emit AddPool(pid, _pool);
   }
 
-  function removePool(uint256 _pid) external override onlyOwner returns (address pool) {
+  function removePool(uint256 _pid) external override onlyManager returns (address pool) {
     require(_pid < pools.length, "Invalid pool index");
     uint256 length = pools.length;
 
