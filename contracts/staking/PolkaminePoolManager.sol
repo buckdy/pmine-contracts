@@ -21,8 +21,7 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable {
   /*** Contract Logic Starts Here */
 
   modifier onlyManager() {
-    require(msg.sender == IPolkamineAddressManager(addressManager).manager(), "not polkamine manager");
-
+    require(msg.sender == IPolkamineAddressManager(addressManager).manager(), "Not polkamine manager");
     _;
   }
 

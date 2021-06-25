@@ -14,9 +14,9 @@ contract PolkamineAddressManager is IPolkamineAddressManager, OwnableUpgradeable
   address public override rewardDepositor;
 
   // polkamine contracts
-  address public override rewardOracle;
-  address public override rewardDistributor;
-  address public override poolManager;
+  address public override rewardOracleContract;
+  address public override rewardDistributorContract;
+  address public override poolManagerContract;
 
   /*** Contract Logic Starts Here */
 
@@ -38,15 +38,15 @@ contract PolkamineAddressManager is IPolkamineAddressManager, OwnableUpgradeable
     rewardDepositor = _rewardDepositor;
   }
 
-  function setRewardOracle(address _rewardOracle) external onlyOwner {
-    rewardOracle = _rewardOracle;
+  function setRewardOracleContract(address _rewardOracleContract) external onlyOwner {
+    rewardOracleContract = _rewardOracleContract;
   }
 
-  function setRewardDistributor(address _rewardDistributor) external onlyOwner {
-    rewardDistributor = _rewardDistributor;
+  function setRewardDistributorContract(address _rewardDistributorContract) external onlyOwner {
+    rewardDistributorContract = _rewardDistributorContract;
   }
 
-  function setPoolManager(address _poolManager) external onlyOwner {
-    poolManager = _poolManager;
+  function setPoolManagerContract(address _poolManagerContract) external onlyOwner {
+    poolManagerContract = _poolManagerContract;
   }
 }
