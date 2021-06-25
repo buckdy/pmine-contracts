@@ -8,9 +8,9 @@ interface IPolkamineAddressManager {
 
   function rewardDepositor() external view returns (address);
 
-  function rewardOracle() external view returns (address);
+  function rewardOracleContract() external view returns (address);
 
-  function rewardDistributor() external view returns (address);
+  function rewardDistributorContract() external view returns (address);
 
-  function poolManager() external view returns (address);
+  function poolManagerContract() external view returns (address);
 }

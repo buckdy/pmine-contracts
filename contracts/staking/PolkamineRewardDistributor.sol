@@ -2,15 +2,20 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "../interfaces/IPolkamineRewardDistributor.sol";
 import "../interfaces/IPolkamineRewardOracle.sol";
 import "../interfaces/IPolkaminePoolManager.sol";
 import "../interfaces/IPolkaminePool.sol";
+import "../interfaces/IPolkamineAddressManager.sol";
 
-contract PolkamineRewardDistributor is IPolkamineRewardDistributor, OwnableUpgradeable, ReentrancyGuardUpgradeable {
+/**
+ * @title Polkamine's Reward Distributor Contract
+ * @notice Distribute each staker the reward
+ * @author Polkamine
+ */
+contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGuardUpgradeable {
   /*** Events ***/
   event Deposit(address indexed from, address indexed rewardToken, uint256 amount);
   event Claim(address indexed beneficiary, address indexed rewardToken, uint256 amount);
@@ -18,30 +23,46 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, OwnableUpgra
   /*** Constants ***/
 
   /*** Storage Properties ***/
-  address public rewardOracle;
-  address public poolManager;
+  address public addressManager;
 
   /*** Contract Logic Starts Here */
 
-  function initialize(address _rewardOracle, address _poolManager) public initializer {
-    __Ownable_init();
-    __ReentrancyGuard_init();
-
-    rewardOracle = _rewardOracle;
-    poolManager = _poolManager;
+  modifier onlyRewardDepositor() {
+    require(msg.sender == IPolkamineAddressManager(addressManager).rewardDepositor(), "Not reward depositor");
+    _;
   }
 
-  function deposit(address _rewardToken, uint256 _amount) external override onlyOwner {
+  function initialize(address _addressManager) public initializer {
+    __ReentrancyGuard_init();
+
+    addressManager = _addressManager;
+  }
+
+  /**
+   * @notice Deposit reward token to distribute to the stakers
+   * @param _rewardToken reward token address
+   * @param _amount reward token amount
+   */
+  function deposit(address _rewardToken, uint256 _amount) external override onlyRewardDepositor {
     require(IERC20Upgradeable(_rewardToken).transferFrom(msg.sender, address(this), _amount), "Transfer failure");
 
     emit Deposit(msg.sender, _rewardToken, _amount);
   }
 
+  /**
+   * @notice Transfer the staker his reward
+   * @param _pid pool index
+   * @param _beneficiary staker address
+   * @param _amount reward token amount to claim
+   */
   function claim(
     uint256 _pid,
     address _beneficiary,
     uint256 _amount
   ) external override nonReentrant {
+    address rewardOracle = IPolkamineAddressManager(addressManager).rewardOracleContract();
+    address poolManager = IPolkamineAddressManager(addressManager).poolManagerContract();
+
     uint256 remainingReward = IPolkamineRewardOracle(rewardOracle).claimableReward(_pid, _beneficiary);
     require(_amount <= remainingReward, "Exceeds claim amount");
 
