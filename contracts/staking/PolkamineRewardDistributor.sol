@@ -56,10 +56,7 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
    * @param _pid pool index
    * @param _amount reward token amount to claim
    */
-  function claim(
-    uint256 _pid,
-    uint256 _amount
-  ) external override nonReentrant {
+  function claim(uint256 _pid, uint256 _amount) external override nonReentrant {
     address poolManager = IPolkamineAddressManager(addressManager).poolManagerContract();
 
     require(_amount <= userClaimableReward(_pid), "Exceeds claim amount");
@@ -70,7 +67,7 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     userClaimedReward[_pid][msg.sender] += _amount;
     poolClaimedReward[_pid] += _amount;
     require(IERC20Upgradeable(rewardToken).transfer(msg.sender, _amount), "Transfer failure");
-    
+
     emit Claim(msg.sender, rewardToken, _amount);
   }
 
