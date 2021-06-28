@@ -6,7 +6,14 @@ interface IPolkamineRewardDistributor {
 
   function claim(
     uint256 _pid,
-    address _beneficiary,
     uint256 _amount
   ) external;
+
+  function userClaimedReward(uint256, address) external view returns (uint256);
+
+  function poolClaimedReward(uint256) external view returns (uint256);
+
+  function userClaimableReward(uint256) external view returns (uint256);
+
+  function poolClaimableReward(uint256) external view returns (uint256);
 }
