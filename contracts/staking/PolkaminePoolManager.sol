@@ -58,4 +58,8 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable {
   function allPools() external view override returns (address[] memory) {
     return pools;
   }
+
+  function poolLength() external view override returns (uint256) {
+    return pools.length;
+  }
 }

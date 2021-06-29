@@ -5,6 +5,8 @@ const { toRole, increaseTime } = require("../utils");
 describe("PolkamineRewardDistributor", () => {
   let pBTCM,
     pETHM,
+    wBTCM,
+    wETHM,
     pBTCMPool,
     pETHMPool,
     polkamineAddressManager,
@@ -29,7 +31,7 @@ describe("PolkamineRewardDistributor", () => {
     // Deploy WToken
     const WToken = await ethers.getContractFactory("WToken");
     wBTCM = await upgrades.deployProxy(WToken, ["wBTCM", "wBTCM"]);
-    wETHM = await upgrades.deployProxy(WToken, ["wBTCM", "wBTCM"]);
+    wETHM = await upgrades.deployProxy(WToken, ["wETHM", "wETHM"]);
 
     // Deploy PolkamineAddressManager
     const PolkamineAddressManager = await ethers.getContractFactory("PolkamineAddressManager");
