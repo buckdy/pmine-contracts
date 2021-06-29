@@ -39,7 +39,7 @@ describe("Polkamine Pool Manage", () => {
     const PolkaminePoolManager = await ethers.getContractFactory("PolkaminePoolManager");
     polkaminePoolManager = await upgrades.deployProxy(PolkaminePoolManager, [polkamineAddressManager.address]);
 
-    // Deploy PolkaminePool and add them to PolkaminePoolManager.
+    // Deploy PolkaminePools.
     const PolkaminePool = await ethers.getContractFactory("PolkaminePool");
     pBTCMPool = await upgrades.deployProxy(PolkaminePool, [pBTCM.address, wBTCM.address]);
     pETHMPool = await upgrades.deployProxy(PolkaminePool, [pETHM.address, wETHM.address]);
