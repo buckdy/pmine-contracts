@@ -85,19 +85,6 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "c__0x2153c617",
-        "type": "bytes32"
-      }
-    ],
-    "name": "c_0x2153c617",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_addressManager",
         "type": "address"
@@ -122,6 +109,19 @@
         "internalType": "bool",
         "name": "",
         "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "poolLength",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
