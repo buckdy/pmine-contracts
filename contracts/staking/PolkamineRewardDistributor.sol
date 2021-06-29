@@ -12,7 +12,7 @@ import "../interfaces/IPolkamineAddressManager.sol";
 
 /**
  * @title Polkamine's Reward Distributor Contract
- * @notice Distribute each staker the reward
+ * @notice Distribute users the reward
  * @author Polkamine
  */
 contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGuardUpgradeable {
@@ -24,6 +24,8 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
 
   /*** Storage Properties ***/
   address public addressManager;
+  mapping(uint256 => mapping(address => uint256)) public override userClaimedReward;
+  mapping(uint256 => uint256) public override poolClaimedReward;
 
   /*** Contract Logic Starts Here */
 
@@ -52,25 +54,42 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
   /**
    * @notice Transfer the staker his reward
    * @param _pid pool index
-   * @param _beneficiary staker address
    * @param _amount reward token amount to claim
    */
-  function claim(
-    uint256 _pid,
-    address _beneficiary,
-    uint256 _amount
-  ) external override nonReentrant {
-    address rewardOracle = IPolkamineAddressManager(addressManager).rewardOracleContract();
+  function claim(uint256 _pid, uint256 _amount) external override nonReentrant {
     address poolManager = IPolkamineAddressManager(addressManager).poolManagerContract();
 
-    uint256 remainingReward = IPolkamineRewardOracle(rewardOracle).claimableReward(_pid, _beneficiary);
-    require(_amount <= remainingReward, "Exceeds claim amount");
+    require(_amount <= userClaimableReward(_pid), "Exceeds claim amount");
 
     address pool = IPolkaminePoolManager(poolManager).pools(_pid);
     address rewardToken = IPolkaminePool(pool).wToken();
-    IPolkamineRewardOracle(rewardOracle).onClaimReward(_pid, _beneficiary, _amount);
-    require(IERC20Upgradeable(rewardToken).transfer(_beneficiary, _amount), "Transfer failure");
 
-    emit Claim(_beneficiary, rewardToken, _amount);
+    userClaimedReward[_pid][msg.sender] += _amount;
+    poolClaimedReward[_pid] += _amount;
+    require(IERC20Upgradeable(rewardToken).transfer(msg.sender, _amount), "Transfer failure");
+
+    emit Claim(msg.sender, rewardToken, _amount);
+  }
+
+  /**
+   * @notice Return user's claimable reward on the specific pool
+   * @param _pid pool index
+   * @return (uint256) user's claimable reward
+   */
+  function userClaimableReward(uint256 _pid) public view override returns (uint256) {
+    address rewardOracle = IPolkamineAddressManager(addressManager).rewardOracleContract();
+
+    return IPolkamineRewardOracle(rewardOracle).userReward(_pid, msg.sender) - userClaimedReward[_pid][msg.sender];
+  }
+
+  /**
+   * @notice Return the claimable reward on the specific pool
+   * @param _pid pool index
+   * @return (uint256) claimable reward on the pool
+   */
+  function poolClaimableReward(uint256 _pid) public view override returns (uint256) {
+    address rewardOracle = IPolkamineAddressManager(addressManager).rewardOracleContract();
+
+    return IPolkamineRewardOracle(rewardOracle).poolReward(_pid) - poolClaimedReward[_pid];
   }
 }

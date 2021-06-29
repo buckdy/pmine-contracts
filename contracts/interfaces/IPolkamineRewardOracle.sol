@@ -8,13 +8,11 @@ interface IPolkamineRewardOracle {
     uint256[] calldata _reward
   ) external;
 
-  function claimableReward(uint256 _pid, address _beneficiary) external returns (uint256);
+  function userReward(uint256 _pid, address _beneficiary) external view returns (uint256);
 
-  function onClaimReward(
-    uint256 _pid,
-    address _beneficiary,
-    uint256 _amount
-  ) external;
+  function poolReward(uint256 _pid) external view returns (uint256);
 
-  function lastUpdatedAt() external returns (uint256);
+  function setLastUpdatedAt(uint256 _lastUpdatedAt) external;
+
+  function lastUpdatedAt() external view returns (uint256);
 }

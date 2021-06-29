@@ -1,29 +1,5 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_pid",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_beneficiary",
-        "type": "address"
-      }
-    ],
-    "name": "claimableReward",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "lastUpdatedAt",
     "outputs": [
@@ -33,7 +9,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -42,19 +18,28 @@
         "internalType": "uint256",
         "name": "_pid",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_beneficiary",
-        "type": "address"
-      },
+      }
+    ],
+    "name": "poolReward",
+    "outputs": [
       {
         "internalType": "uint256",
-        "name": "_amount",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "name": "onClaimReward",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_lastUpdatedAt",
+        "type": "uint256"
+      }
+    ],
+    "name": "setLastUpdatedAt",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -80,6 +65,30 @@
     "name": "setRewardStats",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_pid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_beneficiary",
+        "type": "address"
+      }
+    ],
+    "name": "userReward",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

@@ -8,7 +8,7 @@ import "../interfaces/IPolkamineAddressManager.sol";
 
 /**
  * @title Polkamine's Reward Oracle Contract
- * @notice Manage the reward of each staker per pool based on the mining output
+ * @notice Manage the reward based on the mining output
  * @author Polkamine
  */
 contract PolkamineRewardOracle is IPolkamineRewardOracle, Initializable {
@@ -18,7 +18,8 @@ contract PolkamineRewardOracle is IPolkamineRewardOracle, Initializable {
 
   /*** Storage Properties ***/
   address public addressManager;
-  mapping(uint256 => mapping(address => uint256)) public override claimableReward; // pid => staker => amount
+  mapping(uint256 => mapping(address => uint256)) public override userReward; // pid => staker => amount
+  mapping(uint256 => uint256) public override poolReward;
   uint256 public override lastUpdatedAt;
 
   /*** Contract Logic Starts Here */
@@ -27,14 +28,6 @@ contract PolkamineRewardOracle is IPolkamineRewardOracle, Initializable {
     require(
       msg.sender == IPolkamineAddressManager(addressManager).rewardStatsSubmitter(),
       "Not reward stats submitter"
-    );
-    _;
-  }
-
-  modifier onlyRewardDistributorContract() {
-    require(
-      msg.sender == IPolkamineAddressManager(addressManager).rewardDistributorContract(),
-      "Not reward distributor"
     );
     _;
   }
@@ -57,29 +50,16 @@ contract PolkamineRewardOracle is IPolkamineRewardOracle, Initializable {
     require(_beneficiary.length == _reward.length, "Reward stats unmatched");
 
     for (uint256 i; i < _beneficiary.length; i++) {
-      claimableReward[_pid][_beneficiary[i]] += _reward[i];
+      userReward[_pid][_beneficiary[i]] += _reward[i];
+      poolReward[_pid] += _reward[i];
     }
   }
 
   /**
    * @notice Set the last time updated the reward stats
+   * @param _lastUpdatedAt last updated time
    */
-  function setLastUpdatedAt(uint256 _lastUpdatedAt) external onlyRewardStatsSubmitter {
+  function setLastUpdatedAt(uint256 _lastUpdatedAt) external override onlyRewardStatsSubmitter {
     lastUpdatedAt = _lastUpdatedAt;
-  }
-
-  /**
-   * @notice Decrease the reward amount of the beneficiary
-   * @dev Called only by RewardDistributor contract before sending the reward to a staker
-   * @param _pid pool index
-   * @param _beneficiary address who receives the reward
-   * @param _amount reward amount the beneficiary will receive
-   */
-  function onClaimReward(
-    uint256 _pid,
-    address _beneficiary,
-    uint256 _amount
-  ) external override onlyRewardDistributorContract {
-    claimableReward[_pid][_beneficiary] -= _amount;
   }
 }
