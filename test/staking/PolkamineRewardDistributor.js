@@ -46,10 +46,10 @@ describe("PolkamineRewardDistributor", () => {
     pBTCMPool = await upgrades.deployProxy(PolkaminePool, [pBTCM.address, wBTCM.address]);
     pETHMPool = await upgrades.deployProxy(PolkaminePool, [pETHM.address, wETHM.address]);
 
-    polkaminePoolManager.connect(manager).addPool(pBTCMPool.address);
+    await polkaminePoolManager.connect(manager).addPool(pBTCMPool.address);
     pidPBTCM = 0;
 
-    polkaminePoolManager.connect(manager).addPool(pETHMPool.address);
+    await polkaminePoolManager.connect(manager).addPool(pETHMPool.address);
     pidPETHM = 1;
 
     // Deploy PolkamineRewardDistributor ans set the address to PolkamineAddressManager
@@ -58,18 +58,18 @@ describe("PolkamineRewardDistributor", () => {
       polkamineAddressManager.address,
     ]);
 
-    polkamineAddressManager.setRewardDistributorContract(polkamineRewardDistributor.address);
+    await polkamineAddressManager.setRewardDistributorContract(polkamineRewardDistributor.address);
 
     // Deploy PolkamineRewardOracle ans set the address to PolkamineAddressManager
     const PolkamineRewardOracle = await ethers.getContractFactory("PolkamineRewardOracle");
     polkamineRewardOracle = await upgrades.deployProxy(PolkamineRewardOracle, [polkamineAddressManager.address]);
 
-    polkamineAddressManager.setRewardOracleContract(polkamineRewardOracle.address);
+    await polkamineAddressManager.setRewardOracleContract(polkamineRewardOracle.address);
 
     // Set PoolManager, RewardDepositor and RewardStatsSubmitter
-    polkamineAddressManager.setPoolManagerContract(polkaminePoolManager.address);
-    polkamineAddressManager.setRewardDepositor(rewardDepositor.address);
-    polkamineAddressManager.setRewardStatsSubmitter(rewardStatsSubmitter.address);
+    await polkamineAddressManager.setPoolManagerContract(polkaminePoolManager.address);
+    await polkamineAddressManager.setRewardDepositor(rewardDepositor.address);
+    await polkamineAddressManager.setRewardStatsSubmitter(rewardStatsSubmitter.address);
 
     // Mint pToken and wToken
     await pBTCM.grantRole(MINTER_ROLE, deployer.address);

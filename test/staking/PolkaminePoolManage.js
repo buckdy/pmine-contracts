@@ -50,18 +50,20 @@ describe("Polkamine Pool Manage", () => {
       polkamineAddressManager.address,
     ]);
 
-    polkamineAddressManager.setRewardDistributorContract(polkamineRewardDistributor.address);
+    await polkamineAddressManager.setManager(manager.address);
+
+    await polkamineAddressManager.setRewardDistributorContract(polkamineRewardDistributor.address);
 
     // Deploy PolkamineRewardOracle ans set the address to PolkamineAddressManager
     const PolkamineRewardOracle = await ethers.getContractFactory("PolkamineRewardOracle");
     polkamineRewardOracle = await upgrades.deployProxy(PolkamineRewardOracle, [polkamineAddressManager.address]);
 
-    polkamineAddressManager.setRewardOracleContract(polkamineRewardOracle.address);
+    await polkamineAddressManager.setRewardOracleContract(polkamineRewardOracle.address);
 
     // Set PoolManager, RewardDepositor and RewardStatsSubmitter
-    polkamineAddressManager.setPoolManagerContract(polkaminePoolManager.address);
-    polkamineAddressManager.setRewardDepositor(rewardDepositor.address);
-    polkamineAddressManager.setRewardStatsSubmitter(rewardStatsSubmitter.address);
+    await polkamineAddressManager.setPoolManagerContract(polkaminePoolManager.address);
+    await polkamineAddressManager.setRewardDepositor(rewardDepositor.address);
+    await polkamineAddressManager.setRewardStatsSubmitter(rewardStatsSubmitter.address);
 
     // Mint pToken and wToken
     await pBTCM.grantRole(MINTER_ROLE, deployer.address);
@@ -158,6 +160,13 @@ describe("Polkamine Pool Manage", () => {
       expect(pools[0]).to.be.equal(pBTCMPool.address);
       expect(pools[1]).to.be.equal(pETHMPool.address);
       expect(await polkaminePoolManager.poolLength()).to.be.equal(2);
+    });
+
+    it("Should be able to get pool index", async () => {
+      await expect(polkaminePoolManager.poolIndex(deployer.address)).to.be.revertedWith("Invalid pool");
+
+      expect(await polkaminePoolManager.poolIndex(pBTCMPool.address)).to.be.equal(0);
+      expect(await polkaminePoolManager.poolIndex(pETHMPool.address)).to.be.equal(1);
     });
   });
 });
