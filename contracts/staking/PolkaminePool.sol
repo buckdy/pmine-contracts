@@ -6,6 +6,10 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 
 import "../interfaces/IPolkaminePool.sol";
 
+/**
+ * @title Polkamine's Pool contract
+ * @author icrabbiter
+ */
 contract PolkaminePool is IPolkaminePool, ReentrancyGuardUpgradeable {
   /*** Events ***/
   event Stake(address user, uint256 amount, uint256 timestamp);
@@ -27,6 +31,10 @@ contract PolkaminePool is IPolkaminePool, ReentrancyGuardUpgradeable {
     wToken = _wToken;
   }
 
+  /**
+   * @notice stake pToken
+   * @param _amount the stake amount
+   */
   function stake(uint256 _amount) public override {
     require(IERC20Upgradeable(pToken).transferFrom(msg.sender, address(this), _amount), "Transfer failure");
 
@@ -35,6 +43,10 @@ contract PolkaminePool is IPolkaminePool, ReentrancyGuardUpgradeable {
     emit Stake(msg.sender, _amount, block.timestamp);
   }
 
+  /**
+   * @notice unstake pToken
+   * @param _amount the unstake amount
+   */
   function unstake(uint256 _amount) public override nonReentrant {
     require(_amount <= userStakes[msg.sender], "Invalid amount");
 
