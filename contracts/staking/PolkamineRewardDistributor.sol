@@ -87,7 +87,7 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
    * @param _pid pool index
    * @return (uint256) claimable reward on the pool
    */
-  function poolClaimableReward(uint256 _pid) public view override returns (uint256) {
+  function poolClaimableReward(uint256 _pid) external view override returns (uint256) {
     address rewardOracle = IPolkamineAddressManager(addressManager).rewardOracleContract();
 
     return IPolkamineRewardOracle(rewardOracle).poolReward(_pid) - poolClaimedReward[_pid];

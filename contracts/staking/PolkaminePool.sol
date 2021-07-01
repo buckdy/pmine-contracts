@@ -35,7 +35,7 @@ contract PolkaminePool is IPolkaminePool, ReentrancyGuardUpgradeable {
    * @notice stake pToken
    * @param _amount the stake amount
    */
-  function stake(uint256 _amount) public override {
+  function stake(uint256 _amount) external override {
     require(IERC20Upgradeable(pToken).transferFrom(msg.sender, address(this), _amount), "Transfer failure");
 
     userStakes[msg.sender] = userStakes[msg.sender] + _amount;
@@ -47,7 +47,7 @@ contract PolkaminePool is IPolkaminePool, ReentrancyGuardUpgradeable {
    * @notice unstake pToken
    * @param _amount the unstake amount
    */
-  function unstake(uint256 _amount) public override nonReentrant {
+  function unstake(uint256 _amount) external override nonReentrant {
     require(_amount <= userStakes[msg.sender], "Invalid amount");
 
     userStakes[msg.sender] -= _amount;

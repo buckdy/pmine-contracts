@@ -5,8 +5,8 @@ const { toRole, increaseTime } = require("../utils");
 describe("PolkamineRewardDistributor", () => {
   let pBTCM,
     pETHM,
-    wBTCM,
-    wETHM,
+    wBTCO,
+    wETHO,
     pBTCMPool,
     pETHMPool,
     polkamineAddressManager,
@@ -30,8 +30,8 @@ describe("PolkamineRewardDistributor", () => {
 
     // Deploy WToken
     const WToken = await ethers.getContractFactory("WToken");
-    wBTCM = await upgrades.deployProxy(WToken, ["wBTCM", "wBTCM"]);
-    wETHM = await upgrades.deployProxy(WToken, ["wETHM", "wETHM"]);
+    wBTCO = await upgrades.deployProxy(WToken, ["wBTCO", "wBTCO"]);
+    wETHO = await upgrades.deployProxy(WToken, ["wETHO", "wETHO"]);
 
     // Deploy PolkamineAddressManager
     const PolkamineAddressManager = await ethers.getContractFactory("PolkamineAddressManager");
@@ -43,8 +43,8 @@ describe("PolkamineRewardDistributor", () => {
 
     // Deploy PolkaminePool and add them to PolkaminePoolManager.
     const PolkaminePool = await ethers.getContractFactory("PolkaminePool");
-    pBTCMPool = await upgrades.deployProxy(PolkaminePool, [pBTCM.address, wBTCM.address]);
-    pETHMPool = await upgrades.deployProxy(PolkaminePool, [pETHM.address, wETHM.address]);
+    pBTCMPool = await upgrades.deployProxy(PolkaminePool, [pBTCM.address, wBTCO.address]);
+    pETHMPool = await upgrades.deployProxy(PolkaminePool, [pETHM.address, wETHO.address]);
 
     await polkaminePoolManager.connect(manager).addPool(pBTCMPool.address);
     pidPBTCM = 0;
@@ -80,41 +80,41 @@ describe("PolkamineRewardDistributor", () => {
     await pETHM.mint(alice.address, MINT_AMOUNT);
     await pETHM.mint(bob.address, MINT_AMOUNT);
 
-    await wBTCM.grantRole(MINTER_ROLE, deployer.address);
-    await wETHM.grantRole(MINTER_ROLE, deployer.address);
+    await wBTCO.grantRole(MINTER_ROLE, deployer.address);
+    await wETHO.grantRole(MINTER_ROLE, deployer.address);
 
-    await wBTCM.mint(rewardDepositor.address, MINT_AMOUNT);
-    await wETHM.mint(rewardDepositor.address, MINT_AMOUNT);
+    await wBTCO.mint(rewardDepositor.address, MINT_AMOUNT);
+    await wETHO.mint(rewardDepositor.address, MINT_AMOUNT);
   });
 
   describe("Deposit", async () => {
     it("Should not deposit reward token by non rewardDepositor", async () => {
-      await wBTCM.connect(rewardDepositor).approve(polkamineRewardDistributor.address, MINT_AMOUNT);
-      await expect(polkamineRewardDistributor.deposit(wBTCM.address, MINT_AMOUNT)).to.be.revertedWith(
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, MINT_AMOUNT);
+      await expect(polkamineRewardDistributor.deposit(wBTCO.address, MINT_AMOUNT)).to.be.revertedWith(
         "Not reward depositor",
       );
     });
 
     it("Should deposit reward token", async () => {
-      expect(await wBTCM.balanceOf(rewardDepositor.address)).to.equal(MINT_AMOUNT);
-      expect(await wBTCM.balanceOf(polkamineRewardDistributor.address)).to.equal(0);
-      await wBTCM.connect(rewardDepositor).approve(polkamineRewardDistributor.address, MINT_AMOUNT);
-      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCM.address, MINT_AMOUNT);
-      expect(await wBTCM.balanceOf(rewardDepositor.address)).to.equal(0);
-      expect(await wBTCM.balanceOf(polkamineRewardDistributor.address)).to.equal(MINT_AMOUNT);
+      expect(await wBTCO.balanceOf(rewardDepositor.address)).to.equal(MINT_AMOUNT);
+      expect(await wBTCO.balanceOf(polkamineRewardDistributor.address)).to.equal(0);
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, MINT_AMOUNT);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, MINT_AMOUNT);
+      expect(await wBTCO.balanceOf(rewardDepositor.address)).to.equal(0);
+      expect(await wBTCO.balanceOf(polkamineRewardDistributor.address)).to.equal(MINT_AMOUNT);
     });
   });
 
   describe("Claim", async () => {
     it("Should claim reward token by staker", async () => {
       // deposit first rewards
-      let wBTCMTotalRewardFirst = 30,
-        wETHMTotalRewardFirst = 60;
+      let wBTCOTotalRewardFirst = 30,
+        wETHOTotalRewardFirst = 60;
 
-      await wBTCM.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCMTotalRewardFirst);
-      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCM.address, wBTCMTotalRewardFirst);
-      await wETHM.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHMTotalRewardFirst);
-      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHM.address, wETHMTotalRewardFirst);
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardFirst);
+      await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardFirst);
 
       // set reward stats
       await polkamineRewardOracle
@@ -131,40 +131,40 @@ describe("PolkamineRewardDistributor", () => {
       expect(await polkamineRewardOracle.userReward(pidPETHM, bob.address)).to.equal(35);
       expect(await polkamineRewardOracle.poolReward(pidPETHM)).to.equal(60);
 
-      // claim wBTCM
-      expect(await wBTCM.balanceOf(alice.address)).to.equal(0);
-      expect(await wBTCM.balanceOf(bob.address)).to.equal(0);
+      // claim wBTCO
+      expect(await wBTCO.balanceOf(alice.address)).to.equal(0);
+      expect(await wBTCO.balanceOf(bob.address)).to.equal(0);
       await polkamineRewardDistributor.connect(alice).claim(pidPBTCM, 10);
       await polkamineRewardDistributor.connect(bob).claim(pidPBTCM, 10);
-      expect(await wBTCM.balanceOf(alice.address)).to.equal(10);
-      expect(await wBTCM.balanceOf(bob.address)).to.equal(10);
-      expect(await wBTCM.balanceOf(polkamineRewardDistributor.address)).to.equal(10);
+      expect(await wBTCO.balanceOf(alice.address)).to.equal(10);
+      expect(await wBTCO.balanceOf(bob.address)).to.equal(10);
+      expect(await wBTCO.balanceOf(polkamineRewardDistributor.address)).to.equal(10);
 
       expect(await polkamineRewardDistributor.connect(alice).userClaimableReward(pidPBTCM)).to.equal(10);
       expect(await polkamineRewardDistributor.connect(bob).userClaimableReward(pidPBTCM)).to.equal(0);
       expect(await polkamineRewardDistributor.poolClaimableReward(pidPBTCM)).to.equal(10);
 
-      // claim wETHM
-      expect(await wETHM.balanceOf(alice.address)).to.equal(0);
-      expect(await wETHM.balanceOf(bob.address)).to.equal(0);
+      // claim wETHO
+      expect(await wETHO.balanceOf(alice.address)).to.equal(0);
+      expect(await wETHO.balanceOf(bob.address)).to.equal(0);
       await polkamineRewardDistributor.connect(alice).claim(pidPETHM, 20);
       await polkamineRewardDistributor.connect(bob).claim(pidPETHM, 20);
-      expect(await wETHM.balanceOf(alice.address)).to.equal(20);
-      expect(await wETHM.balanceOf(bob.address)).to.equal(20);
-      expect(await wETHM.balanceOf(polkamineRewardDistributor.address)).to.equal(20);
+      expect(await wETHO.balanceOf(alice.address)).to.equal(20);
+      expect(await wETHO.balanceOf(bob.address)).to.equal(20);
+      expect(await wETHO.balanceOf(polkamineRewardDistributor.address)).to.equal(20);
 
       expect(await polkamineRewardDistributor.connect(alice).userClaimableReward(pidPETHM)).to.equal(5);
       expect(await polkamineRewardDistributor.connect(bob).userClaimableReward(pidPETHM)).to.equal(15);
       expect(await polkamineRewardDistributor.poolClaimableReward(pidPETHM)).to.equal(20);
 
       // deposit second rewards
-      let wBTCMTotalRewardSecond = 25,
-        wETHMTotalRewardSecond = 10;
+      let wBTCOTotalRewardSecond = 25,
+        wETHOTotalRewardSecond = 10;
 
-      await wBTCM.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCMTotalRewardSecond);
-      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCM.address, wBTCMTotalRewardSecond);
-      await wETHM.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHMTotalRewardSecond);
-      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHM.address, wETHMTotalRewardSecond);
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardSecond);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardSecond);
+      await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardSecond);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardSecond);
 
       // set reward stats
       await polkamineRewardOracle
@@ -191,13 +191,13 @@ describe("PolkamineRewardDistributor", () => {
       expect(await polkamineRewardDistributor.poolClaimableReward(pidPETHM)).to.equal(30);
 
       // deposit third rewards
-      let wBTCMTotalRewardThird = 25,
-        wETHMTotalRewardThird = 10;
+      let wBTCOTotalRewardThird = 25,
+        wETHOTotalRewardThird = 10;
 
-      await wBTCM.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCMTotalRewardThird);
-      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCM.address, wBTCMTotalRewardThird);
-      await wETHM.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHMTotalRewardThird);
-      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHM.address, wETHMTotalRewardThird);
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardThird);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardThird);
+      await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardThird);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardThird);
 
       // set reward stats
       await polkamineRewardOracle
@@ -214,27 +214,27 @@ describe("PolkamineRewardDistributor", () => {
       expect(await polkamineRewardOracle.userReward(pidPETHM, bob.address)).to.equal(50);
       expect(await polkamineRewardOracle.poolReward(pidPETHM)).to.equal(80);
 
-      // claim wBTCM
-      expect(await wBTCM.balanceOf(alice.address)).to.equal(10);
-      expect(await wBTCM.balanceOf(bob.address)).to.equal(10);
+      // claim wBTCO
+      expect(await wBTCO.balanceOf(alice.address)).to.equal(10);
+      expect(await wBTCO.balanceOf(bob.address)).to.equal(10);
       await polkamineRewardDistributor.connect(alice).claim(pidPBTCM, 30);
       await polkamineRewardDistributor.connect(bob).claim(pidPBTCM, 20);
-      expect(await wBTCM.balanceOf(alice.address)).to.equal(40);
-      expect(await wBTCM.balanceOf(bob.address)).to.equal(30);
-      expect(await wBTCM.balanceOf(polkamineRewardDistributor.address)).to.equal(10);
+      expect(await wBTCO.balanceOf(alice.address)).to.equal(40);
+      expect(await wBTCO.balanceOf(bob.address)).to.equal(30);
+      expect(await wBTCO.balanceOf(polkamineRewardDistributor.address)).to.equal(10);
 
       expect(await polkamineRewardDistributor.connect(alice).userClaimableReward(pidPBTCM)).to.equal(0);
       expect(await polkamineRewardDistributor.connect(bob).userClaimableReward(pidPBTCM)).to.equal(10);
       expect(await polkamineRewardDistributor.poolClaimableReward(pidPBTCM)).to.equal(10);
 
-      // claim wETHM
-      expect(await wETHM.balanceOf(alice.address)).to.equal(20);
-      expect(await wETHM.balanceOf(bob.address)).to.equal(20);
+      // claim wETHO
+      expect(await wETHO.balanceOf(alice.address)).to.equal(20);
+      expect(await wETHO.balanceOf(bob.address)).to.equal(20);
       await polkamineRewardDistributor.connect(alice).claim(pidPETHM, 10);
       await polkamineRewardDistributor.connect(bob).claim(pidPETHM, 20);
-      expect(await wETHM.balanceOf(alice.address)).to.equal(30);
-      expect(await wETHM.balanceOf(bob.address)).to.equal(40);
-      expect(await wETHM.balanceOf(polkamineRewardDistributor.address)).to.equal(10);
+      expect(await wETHO.balanceOf(alice.address)).to.equal(30);
+      expect(await wETHO.balanceOf(bob.address)).to.equal(40);
+      expect(await wETHO.balanceOf(polkamineRewardDistributor.address)).to.equal(10);
 
       expect(await polkamineRewardDistributor.connect(alice).userClaimableReward(pidPETHM)).to.equal(0);
       expect(await polkamineRewardDistributor.connect(bob).userClaimableReward(pidPETHM)).to.equal(10);
@@ -243,18 +243,18 @@ describe("PolkamineRewardDistributor", () => {
 
     it("Should not claim reward token with the exceeded amount", async () => {
       // deposit first rewards
-      let wBTCMTotalRewardFirst = 30,
-        wETHMTotalRewardFirst = 60;
+      let wBTCOTotalRewardFirst = 30,
+        wETHOTotalRewardFirst = 60;
 
-      await wBTCM.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCMTotalRewardFirst);
-      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCM.address, wBTCMTotalRewardFirst);
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardFirst);
 
       // set reward stats
       await polkamineRewardOracle
         .connect(rewardStatsSubmitter)
         .setRewardStats(pidPBTCM, [alice.address, bob.address], [20, 10]);
 
-      // claim wBTCM
+      // claim wBTCO
       let claimAmount = await polkamineRewardDistributor.connect(alice).userClaimableReward(pidPBTCM);
       claimAmount++;
       await expect(polkamineRewardDistributor.connect(alice).claim(pidPETHM, claimAmount)).to.be.revertedWith(

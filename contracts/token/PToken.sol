@@ -35,7 +35,7 @@ contract PToken is ERC20Upgradeable, AccessControlUpgradeable {
    * @param to address to receive the token minted
    * @param amount token amount to be minted
    */
-  function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
+  function mint(address to, uint256 amount) external onlyRole(MINTER_ROLE) {
     _mint(to, amount);
 
     emit Mint(to, amount);
@@ -44,7 +44,7 @@ contract PToken is ERC20Upgradeable, AccessControlUpgradeable {
   /**
    * @notice Burn `amount` tokens from the caller.
    */
-  function burn(uint256 amount) public virtual {
+  function burn(uint256 amount) external virtual {
     _burn(msg.sender, amount);
 
     emit Burn(address(this), amount);
@@ -56,7 +56,7 @@ contract PToken is ERC20Upgradeable, AccessControlUpgradeable {
    * @param from address from which the token will be burned
    * @param amount token amount to be burned
    */
-  function burnFrom(address from, uint256 amount) public virtual onlyRole(BURNER_ROLE) {
+  function burnFrom(address from, uint256 amount) external virtual onlyRole(BURNER_ROLE) {
     uint256 currentAllowance = allowance(from, msg.sender);
     require(currentAllowance >= amount, "PToken: exceeds allowance");
     _approve(from, msg.sender, currentAllowance - amount);

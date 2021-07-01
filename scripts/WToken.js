@@ -15,10 +15,10 @@ main = async () => {
 
   // We get the contract to deploy
   const WToken = await hre.ethers.getContractFactory("WToken");
-  wBTCM = await upgrades.deployProxy(WToken, ["wBTCM", "wBTCM"]);
-  await wBTCM.deployed();
+  wBTCO = await upgrades.deployProxy(WToken, ["wBTCO", "wBTCO"]);
+  await wBTCO.deployed();
 
-  console.log("wBTCM token contract deployed to:", wBTCM.address);
+  console.log("wBTCO token contract deployed to:", wBTCO.address);
 };
 
 // We recommend this pattern to be able to use async/await everywhere

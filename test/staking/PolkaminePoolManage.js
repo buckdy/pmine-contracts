@@ -5,8 +5,8 @@ const { toRole, increaseTime } = require("../utils");
 describe("Polkamine Pool Manage", () => {
   let pBTCM,
     pETHM,
-    wBTCM,
-    wETHM,
+    wBTCO,
+    wETHO,
     pBTCMPool,
     pETHMPool,
     polkamineAddressManager,
@@ -28,8 +28,8 @@ describe("Polkamine Pool Manage", () => {
 
     // Deploy WToken
     const WToken = await ethers.getContractFactory("WToken");
-    wBTCM = await upgrades.deployProxy(WToken, ["wBTCM", "wBTCM"]);
-    wETHM = await upgrades.deployProxy(WToken, ["wETHM", "wETHM"]);
+    wBTCO = await upgrades.deployProxy(WToken, ["wBTCO", "wBTCO"]);
+    wETHO = await upgrades.deployProxy(WToken, ["wETHO", "wETHO"]);
 
     // Deploy PolkamineAddressManager
     const PolkamineAddressManager = await ethers.getContractFactory("PolkamineAddressManager");
@@ -41,8 +41,8 @@ describe("Polkamine Pool Manage", () => {
 
     // Deploy PolkaminePools.
     const PolkaminePool = await ethers.getContractFactory("PolkaminePool");
-    pBTCMPool = await upgrades.deployProxy(PolkaminePool, [pBTCM.address, wBTCM.address]);
-    pETHMPool = await upgrades.deployProxy(PolkaminePool, [pETHM.address, wETHM.address]);
+    pBTCMPool = await upgrades.deployProxy(PolkaminePool, [pBTCM.address, wBTCO.address]);
+    pETHMPool = await upgrades.deployProxy(PolkaminePool, [pETHM.address, wETHO.address]);
 
     // Deploy PolkamineRewardDistributor ans set the address to PolkamineAddressManager
     const PolkamineRewardDistributor = await ethers.getContractFactory("PolkamineRewardDistributor");
@@ -74,17 +74,17 @@ describe("Polkamine Pool Manage", () => {
     await pETHM.mint(alice.address, MINT_AMOUNT);
     await pETHM.mint(bob.address, MINT_AMOUNT);
 
-    await wBTCM.grantRole(MINTER_ROLE, deployer.address);
-    await wETHM.grantRole(MINTER_ROLE, deployer.address);
+    await wBTCO.grantRole(MINTER_ROLE, deployer.address);
+    await wETHO.grantRole(MINTER_ROLE, deployer.address);
 
-    await wBTCM.mint(rewardDepositor.address, MINT_AMOUNT);
-    await wETHM.mint(rewardDepositor.address, MINT_AMOUNT);
+    await wBTCO.mint(rewardDepositor.address, MINT_AMOUNT);
+    await wETHO.mint(rewardDepositor.address, MINT_AMOUNT);
   });
 
   describe("PolkaminePool", () => {
     it("Should initialize", async () => {
       expect(await pBTCMPool.pToken()).to.be.equal(pBTCM.address);
-      expect(await pBTCMPool.wToken()).to.be.equal(wBTCM.address);
+      expect(await pBTCMPool.wToken()).to.be.equal(wBTCO.address);
     });
     it("Should be able to stake", async () => {
       await expect(pBTCMPool.connect(alice).stake(10)).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
