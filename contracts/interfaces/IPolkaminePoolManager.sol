@@ -6,9 +6,9 @@ interface IPolkaminePoolManager {
 
   function removePool(uint256 _pid) external returns (address);
 
-  function allPools() external returns (address[] memory);
+  function allPools() external view returns (address[] memory);
 
-  function poolLength() external returns (uint256);
+  function poolLength() external view returns (uint256);
 
-  function pools(uint256 _pid) external returns (address);
+  function pools(uint256 _pid) external view returns (address);
 }
