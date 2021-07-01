@@ -5,8 +5,8 @@ const { toRole, increaseTime } = require("../utils");
 describe("PolkamineRewardOracle", () => {
   let pBTCM,
     pETHM,
-    wBTCM,
-    wETHM,
+    wBTCO,
+    wETHO,
     pBTCMPool,
     pETHMPool,
     polkamineAddressManager,
@@ -30,8 +30,8 @@ describe("PolkamineRewardOracle", () => {
 
     // Deploy WToken
     const WToken = await ethers.getContractFactory("WToken");
-    wBTCM = await upgrades.deployProxy(WToken, ["wBTCM", "wBTCM"]);
-    wETHM = await upgrades.deployProxy(WToken, ["wETHM", "wETHM"]);
+    wBTCO = await upgrades.deployProxy(WToken, ["wBTCO", "wBTCO"]);
+    wETHO = await upgrades.deployProxy(WToken, ["wETHO", "wETHO"]);
 
     // Deploy PolkamineAddressManager
     const PolkamineAddressManager = await ethers.getContractFactory("PolkamineAddressManager");
@@ -43,8 +43,8 @@ describe("PolkamineRewardOracle", () => {
 
     // Deploy PolkaminePool and add them to PolkaminePoolManager.
     const PolkaminePool = await ethers.getContractFactory("PolkaminePool");
-    pBTCMPool = await upgrades.deployProxy(PolkaminePool, [pBTCM.address, wBTCM.address]);
-    pETHMPool = await upgrades.deployProxy(PolkaminePool, [pETHM.address, wETHM.address]);
+    pBTCMPool = await upgrades.deployProxy(PolkaminePool, [pBTCM.address, wBTCO.address]);
+    pETHMPool = await upgrades.deployProxy(PolkaminePool, [pETHM.address, wETHO.address]);
 
     await polkaminePoolManager.connect(manager).addPool(pBTCMPool.address);
     pidPBTCM = 0;
@@ -80,11 +80,11 @@ describe("PolkamineRewardOracle", () => {
     await pETHM.mint(alice.address, MINT_AMOUNT);
     await pETHM.mint(bob.address, MINT_AMOUNT);
 
-    await wBTCM.grantRole(MINTER_ROLE, deployer.address);
-    await wETHM.grantRole(MINTER_ROLE, deployer.address);
+    await wBTCO.grantRole(MINTER_ROLE, deployer.address);
+    await wETHO.grantRole(MINTER_ROLE, deployer.address);
 
-    await wBTCM.mint(rewardDepositor.address, MINT_AMOUNT);
-    await wETHM.mint(rewardDepositor.address, MINT_AMOUNT);
+    await wBTCO.mint(rewardDepositor.address, MINT_AMOUNT);
+    await wETHO.mint(rewardDepositor.address, MINT_AMOUNT);
   });
 
   describe("Set Reward Stats", async () => {
