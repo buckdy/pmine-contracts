@@ -58,7 +58,7 @@ contract MINEToken is ERC20Upgradeable, AccessControlUpgradeable {
    */
   function burnFrom(address from, uint256 amount) external virtual onlyRole(BURNER_ROLE) {
     uint256 currentAllowance = allowance(from, msg.sender);
-    require(currentAllowance >= amount, "PToken: exceeds allowance");
+    require(currentAllowance >= amount, "MINEToken: exceeds allowance");
     _approve(from, msg.sender, currentAllowance - amount);
     _burn(from, amount);
 
