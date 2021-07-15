@@ -6,5 +6,5 @@ interface IPolkaminePool {
 
   function unstake(uint256 _amount) external;
 
-  function wToken() external returns (address);
+  function wToken() external view returns (address);
 }

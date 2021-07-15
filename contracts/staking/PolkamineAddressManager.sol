@@ -12,7 +12,7 @@ import "../interfaces/IPolkamineAddressManager.sol";
 contract PolkamineAddressManager is IPolkamineAddressManager, OwnableUpgradeable {
   /*** Storage Properties ***/
 
-  // polkamine managed addresses
+  // polkamine manager addresses
   address public override manager;
   address public override rewardStatsSubmitter;
   address public override rewardDepositor;
