@@ -7,18 +7,16 @@ import "../interfaces/IPolkamineAddressManager.sol";
 
 /**
  * @title Polkamine's Address Manager contract
- * @author icrabbiter
+ * @author Polkamine
  */
 contract PolkamineAddressManager is IPolkamineAddressManager, OwnableUpgradeable {
   /*** Storage Properties ***/
 
   // polkamine manager addresses
   address public override manager;
-  address public override rewardStatsSubmitter;
   address public override rewardDepositor;
 
   // polkamine contracts
-  address public override rewardOracleContract;
   address public override rewardDistributorContract;
   address public override poolManagerContract;
 
@@ -39,27 +37,11 @@ contract PolkamineAddressManager is IPolkamineAddressManager, OwnableUpgradeable
   }
 
   /**
-   * @notice set reward stats submitter
-   * @param _rewardStatsSubmitter the submitter address
-   */
-  function setRewardStatsSubmitter(address _rewardStatsSubmitter) external onlyOwner {
-    rewardStatsSubmitter = _rewardStatsSubmitter;
-  }
-
-  /**
    * @notice set reward depositor
    * @param _rewardDepositor the depositor address
    */
   function setRewardDepositor(address _rewardDepositor) external onlyOwner {
     rewardDepositor = _rewardDepositor;
-  }
-
-  /**
-   * @notice set reward oracle contract
-   * @param _rewardOracleContract the reward oracle contract address
-   */
-  function setRewardOracleContract(address _rewardOracleContract) external onlyOwner {
-    rewardOracleContract = _rewardOracleContract;
   }
 
   /**

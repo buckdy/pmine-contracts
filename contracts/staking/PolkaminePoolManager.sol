@@ -8,7 +8,7 @@ import "../interfaces/IPolkamineAddressManager.sol";
 
 /**
  * @title Polkamine's Pool Manager contract
- * @author icrabbiter
+ * @author Polkamine
  */
 contract PolkaminePoolManager is IPolkaminePoolManager, Initializable {
   /*** Events ***/

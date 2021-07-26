@@ -8,12 +8,12 @@ import "../interfaces/IPolkaminePool.sol";
 
 /**
  * @title Polkamine's Pool contract
- * @author icrabbiter
+ * @author Polkamine
  */
 contract PolkaminePool is IPolkaminePool, ReentrancyGuardUpgradeable {
   /*** Events ***/
-  event Stake(address user, uint256 amount, uint256 timestamp);
-  event Unstake(address user, uint256 amount, uint256 timestamp);
+  event Stake(address indexed user, uint256 amount, uint256 timestamp);
+  event Unstake(address indexed user, uint256 amount, uint256 timestamp);
 
   /*** Constants ***/
 
@@ -38,7 +38,7 @@ contract PolkaminePool is IPolkaminePool, ReentrancyGuardUpgradeable {
   function stake(uint256 _amount) external override {
     require(IERC20Upgradeable(pToken).transferFrom(msg.sender, address(this), _amount), "Transfer failure");
 
-    userStakes[msg.sender] = userStakes[msg.sender] + _amount;
+    userStakes[msg.sender] += _amount;
 
     emit Stake(msg.sender, _amount, block.timestamp);
   }
