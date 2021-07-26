@@ -104,32 +104,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "rewardOracleContract",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "rewardStatsSubmitter",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -177,32 +151,6 @@
       }
     ],
     "name": "setRewardDistributorContract",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_rewardOracleContract",
-        "type": "address"
-      }
-    ],
-    "name": "setRewardOracleContract",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_rewardStatsSubmitter",
-        "type": "address"
-      }
-    ],
-    "name": "setRewardStatsSubmitter",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
