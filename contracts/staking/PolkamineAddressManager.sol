@@ -15,6 +15,7 @@ contract PolkamineAddressManager is IPolkamineAddressManager, OwnableUpgradeable
   // polkamine manager addresses
   address public override manager;
   address public override rewardDepositor;
+  address public override maintainer;
 
   // polkamine contracts
   address public override rewardDistributorContract;
@@ -58,5 +59,13 @@ contract PolkamineAddressManager is IPolkamineAddressManager, OwnableUpgradeable
    */
   function setPoolManagerContract(address _poolManagerContract) external onlyOwner {
     poolManagerContract = _poolManagerContract;
+  }
+
+  /**
+   * @notice set maintainer address
+   * @param _maintainer maintainer address
+   */
+  function setMaintainer(address _maintainer) external onlyOwner {
+    maintainer = _maintainer;
   }
 }

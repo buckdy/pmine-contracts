@@ -6,6 +6,8 @@ interface IPolkamineAddressManager {
 
   function rewardDepositor() external view returns (address);
 
+  function maintainer() external view returns (address);
+
   function rewardDistributorContract() external view returns (address);
 
   function poolManagerContract() external view returns (address);

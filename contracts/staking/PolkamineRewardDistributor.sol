@@ -51,6 +51,11 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     _;
   }
 
+  modifier onlyMaintainer() {
+    require(msg.sender == IPolkamineAddressManager(addressManager).maintainer(), "Not maintainer");
+    _;
+  }
+
   function initialize(address _addressManager, uint256 _rewardInterval) public initializer {
     __ReentrancyGuard_init();
 
@@ -106,26 +111,21 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     uint256 _rewardIndex,
     bytes memory _signature
   ) external override nonReentrant {
-    // check signature
     require(!isUsedSignature[_signature], "Already used signature");
     isUsedSignature[_signature] = true;
 
-    // check reward index
     require(_rewardIndex == rewardIndex, "Invalid reward index");
 
-    // check claim interval
     require(block.timestamp > userLastClaimedAt[msg.sender] + rewardInterval, "Invalid interval");
     userLastClaimedAt[msg.sender] = block.timestamp;
 
-    // check signer
+    address maintainer = IPolkamineAddressManager(addressManager).maintainer();
     address messageSigner = recoverSignature(msg.sender, _pid, _amount, _rewardIndex, _signature);
-    require(messageSigner == msg.sender, "Invalid signer");
+    require(messageSigner == maintainer, "Invalid signer");
 
-    // check pid
     address poolManager = IPolkamineAddressManager(addressManager).poolManagerContract();
     require(_pid < IPolkaminePoolManager(poolManager).poolLength(), "Invalid pid");
 
-    // check wToken
     address pool = IPolkaminePoolManager(poolManager).pools(_pid);
     address rewardToken = IPolkaminePool(pool).wToken();
     require(rewardToken == _wToken, "Unmatched reward token");
@@ -141,7 +141,7 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     rewardInterval = _rewardInterval;
   }
 
-  function setRewardIndex(uint256 _rewardIndex) external override onlyManager {
+  function setRewardIndex(uint256 _rewardIndex) external override onlyMaintainer {
     rewardIndex = _rewardIndex;
   }
 }

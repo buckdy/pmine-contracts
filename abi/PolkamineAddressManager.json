@@ -33,6 +33,19 @@
   },
   {
     "inputs": [],
+    "name": "maintainer",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "manager",
     "outputs": [
       {
@@ -101,6 +114,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_maintainer",
+        "type": "address"
+      }
+    ],
+    "name": "setMaintainer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
