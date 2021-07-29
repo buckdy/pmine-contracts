@@ -3,8 +3,8 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
 
-import "../lib/Call.sol";
 import "../interfaces/IPolkamineRewardDistributor.sol";
 import "../interfaces/IPolkaminePoolManager.sol";
 import "../interfaces/IPolkaminePool.sol";
@@ -16,7 +16,7 @@ import "../interfaces/IPolkamineAddressManager.sol";
  * @author Polkamine
  */
 contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGuardUpgradeable {
-  using Call for *;
+  using ECDSAUpgradeable for bytes32;
 
   /*** Events ***/
   event Deposit(address indexed from, address indexed rewardToken, uint256 amount);
@@ -64,28 +64,6 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
   }
 
   /**
-   * @notice Function to check the signer of the message
-   * @param _userAddress user to claim the reward
-   * @param _pid pool index
-   * @param _amount token amount to claim
-   * @param _rewardIndex reward index
-   * @param _signature signature created by the user
-   */
-  function recoverSignature(
-    address _userAddress,
-    uint256 _pid,
-    uint256 _amount,
-    uint256 _rewardIndex,
-    bytes memory _signature
-  ) private pure returns (address) {
-    // Generate hash
-    bytes32 hash = keccak256(abi.encodePacked(_userAddress, _pid, _amount, _rewardIndex));
-
-    // Recover signer message from signature
-    return Call.recoverHash(hash, _signature, 0);
-  }
-
-  /**
    * @notice Deposit reward token to distribute to the stakers
    * @param _rewardToken reward token address
    * @param _amount reward token amount
@@ -120,8 +98,8 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     userLastClaimedAt[msg.sender] = block.timestamp;
 
     address maintainer = IPolkamineAddressManager(addressManager).maintainer();
-    address messageSigner = recoverSignature(msg.sender, _pid, _amount, _rewardIndex, _signature);
-    require(messageSigner == maintainer, "Invalid signer");
+    bytes32 data = keccak256(abi.encodePacked(msg.sender, _pid, _wToken, _amount, _rewardIndex));
+    require(data.toEthSignedMessageHash().recover(_signature) == maintainer, "Invalid signer");
 
     address poolManager = IPolkamineAddressManager(addressManager).poolManagerContract();
     require(_pid < IPolkaminePoolManager(poolManager).poolLength(), "Invalid pid");
@@ -137,10 +115,16 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     emit Claim(msg.sender, _pid, rewardToken, _amount, _rewardIndex);
   }
 
+  /**
+   * @notice Set the interval valid between reward claim request
+   */
   function setRewardInterval(uint256 _rewardInterval) external override onlyManager {
     rewardInterval = _rewardInterval;
   }
 
+  /**
+   * @notice Set the reward index
+   */
   function setRewardIndex(uint256 _rewardIndex) external override onlyMaintainer {
     rewardIndex = _rewardIndex;
   }
