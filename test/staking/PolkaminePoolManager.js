@@ -83,87 +83,87 @@ describe("Polkamine Pool Manage", () => {
       expect(await pBTCMPool.wToken()).to.be.equal(wBTCO.address);
     });
 
-    // it("Should be able to stake", async () => {
-    //   await expect(pBTCMPool.connect(alice).stake(10)).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
+    it("Should be able to stake", async () => {
+      await expect(pBTCMPool.connect(alice).stake(10)).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
 
-    //   await pBTCM.connect(alice).approve(pBTCMPool.address, ethers.constants.MaxUint256);
+      await pBTCM.connect(alice).approve(pBTCMPool.address, ethers.constants.MaxUint256);
 
-    //   await expect(pBTCMPool.connect(alice).stake(MINT_AMOUNT + 1)).to.be.revertedWith(
-    //     "ERC20: transfer amount exceeds balance",
-    //   );
+      await expect(pBTCMPool.connect(alice).stake(MINT_AMOUNT + 1)).to.be.revertedWith(
+        "ERC20: transfer amount exceeds balance",
+      );
 
-    //   expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT);
-    //   expect(await pBTCM.balanceOf(pBTCMPool.address)).to.be.equal(0);
-    //   await pBTCMPool.connect(alice).stake(10);
-    //   expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT - 10);
-    //   expect(await pBTCM.balanceOf(pBTCMPool.address)).to.be.equal(10);
-    // });
+      expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT);
+      expect(await pBTCM.balanceOf(pBTCMPool.address)).to.be.equal(0);
+      await pBTCMPool.connect(alice).stake(10);
+      expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT - 10);
+      expect(await pBTCM.balanceOf(pBTCMPool.address)).to.be.equal(10);
+    });
 
-    // it("Should be able to unstake", async () => {
-    //   await expect(pBTCMPool.connect(alice).unstake(11)).to.be.revertedWith("Invalid amount");
+    it("Should be able to unstake", async () => {
+      await expect(pBTCMPool.connect(alice).unstake(11)).to.be.revertedWith("Invalid amount");
 
-    //   expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT - 10);
-    //   expect(await pBTCM.balanceOf(pBTCMPool.address)).to.be.equal(10);
-    //   await pBTCMPool.connect(alice).unstake(10);
-    //   expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT);
-    //   expect(await pBTCM.balanceOf(pBTCMPool.address)).to.be.equal(0);
-    // });
+      expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT - 10);
+      expect(await pBTCM.balanceOf(pBTCMPool.address)).to.be.equal(10);
+      await pBTCMPool.connect(alice).unstake(10);
+      expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT);
+      expect(await pBTCM.balanceOf(pBTCMPool.address)).to.be.equal(0);
+    });
   });
 
-  // describe("PolkaminePoolManager", () => {
-  //   it("Should initialize", async () => {
-  //     expect(await polkaminePoolManager.addressManager()).to.be.equal(polkamineAddressManager.address);
-  //   });
+  describe("PolkaminePoolManager", () => {
+    it("Should initialize", async () => {
+      expect(await polkaminePoolManager.addressManager()).to.be.equal(polkamineAddressManager.address);
+    });
 
-  //   it("Should be able to add pool", async () => {
-  //     await expect(polkaminePoolManager.addPool(pBTCMPool.address)).to.be.revertedWith("Not polkamine manager");
+    it("Should be able to add pool", async () => {
+      await expect(polkaminePoolManager.addPool(pBTCMPool.address)).to.be.revertedWith("Not polkamine manager");
 
-  //     await expect(polkaminePoolManager.pools(0)).to.be.reverted;
-  //     expect(await polkaminePoolManager.isPool(pBTCMPool.address)).to.be.false;
-  //     expect(await polkaminePoolManager.poolLength()).to.be.equal(0);
-  //     await polkaminePoolManager.connect(manager).addPool(pBTCMPool.address);
-  //     expect(await polkaminePoolManager.pools(0)).to.be.equal(pBTCMPool.address);
-  //     expect(await polkaminePoolManager.isPool(pBTCMPool.address)).to.be.true;
-  //     expect(await polkaminePoolManager.poolLength()).to.be.equal(1);
+      await expect(polkaminePoolManager.pools(0)).to.be.reverted;
+      expect(await polkaminePoolManager.isPool(pBTCMPool.address)).to.be.false;
+      expect(await polkaminePoolManager.poolLength()).to.be.equal(0);
+      await polkaminePoolManager.connect(manager).addPool(pBTCMPool.address);
+      expect(await polkaminePoolManager.pools(0)).to.be.equal(pBTCMPool.address);
+      expect(await polkaminePoolManager.isPool(pBTCMPool.address)).to.be.true;
+      expect(await polkaminePoolManager.poolLength()).to.be.equal(1);
 
-  //     await expect(polkaminePoolManager.connect(manager).addPool(pBTCMPool.address)).to.be.revertedWith(
-  //       "Pool already exists",
-  //     );
-  //   });
+      await expect(polkaminePoolManager.connect(manager).addPool(pBTCMPool.address)).to.be.revertedWith(
+        "Pool already exists",
+      );
+    });
 
-  //   it("Should be able to remove pool", async () => {
-  //     await expect(polkaminePoolManager.removePool(0)).to.be.revertedWith("Not polkamine manager");
-  //     await expect(polkaminePoolManager.connect(manager).removePool(1)).to.be.revertedWith("Invalid pool index");
+    it("Should be able to remove pool", async () => {
+      await expect(polkaminePoolManager.removePool(0)).to.be.revertedWith("Not polkamine manager");
+      await expect(polkaminePoolManager.connect(manager).removePool(1)).to.be.revertedWith("Invalid pool index");
 
-  //     expect(await polkaminePoolManager.pools(0)).to.be.equal(pBTCMPool.address);
-  //     expect(await polkaminePoolManager.isPool(pBTCMPool.address)).to.be.true;
-  //     expect(await polkaminePoolManager.poolLength()).to.be.equal(1);
-  //     await polkaminePoolManager.connect(manager).removePool(0);
-  //     await expect(polkaminePoolManager.pools(0)).to.be.reverted;
-  //     expect(await polkaminePoolManager.isPool(pBTCMPool.address)).to.be.false;
-  //     expect(await polkaminePoolManager.poolLength()).to.be.equal(0);
-  //   });
+      expect(await polkaminePoolManager.pools(0)).to.be.equal(pBTCMPool.address);
+      expect(await polkaminePoolManager.isPool(pBTCMPool.address)).to.be.true;
+      expect(await polkaminePoolManager.poolLength()).to.be.equal(1);
+      await polkaminePoolManager.connect(manager).removePool(0);
+      await expect(polkaminePoolManager.pools(0)).to.be.reverted;
+      expect(await polkaminePoolManager.isPool(pBTCMPool.address)).to.be.false;
+      expect(await polkaminePoolManager.poolLength()).to.be.equal(0);
+    });
 
-  //   it("Should be able to get all pools", async () => {
-  //     let pools = await polkaminePoolManager.allPools();
-  //     expect(pools.length).to.be.equal(0);
-  //     expect(await polkaminePoolManager.poolLength()).to.be.equal(0);
+    it("Should be able to get all pools", async () => {
+      let pools = await polkaminePoolManager.allPools();
+      expect(pools.length).to.be.equal(0);
+      expect(await polkaminePoolManager.poolLength()).to.be.equal(0);
 
-  //     await polkaminePoolManager.connect(manager).addPool(pBTCMPool.address);
-  //     await polkaminePoolManager.connect(manager).addPool(pETHMPool.address);
+      await polkaminePoolManager.connect(manager).addPool(pBTCMPool.address);
+      await polkaminePoolManager.connect(manager).addPool(pETHMPool.address);
 
-  //     pools = await polkaminePoolManager.allPools();
-  //     expect(pools.length).to.be.equal(2);
-  //     expect(pools[0]).to.be.equal(pBTCMPool.address);
-  //     expect(pools[1]).to.be.equal(pETHMPool.address);
-  //     expect(await polkaminePoolManager.poolLength()).to.be.equal(2);
-  //   });
+      pools = await polkaminePoolManager.allPools();
+      expect(pools.length).to.be.equal(2);
+      expect(pools[0]).to.be.equal(pBTCMPool.address);
+      expect(pools[1]).to.be.equal(pETHMPool.address);
+      expect(await polkaminePoolManager.poolLength()).to.be.equal(2);
+    });
 
-  //   it("Should be able to get pool index", async () => {
-  //     await expect(polkaminePoolManager.poolIndex(deployer.address)).to.be.revertedWith("Invalid pool");
+    it("Should be able to get pool index", async () => {
+      await expect(polkaminePoolManager.poolIndex(deployer.address)).to.be.revertedWith("Invalid pool");
 
-  //     expect(await polkaminePoolManager.poolIndex(pBTCMPool.address)).to.be.equal(0);
-  //     expect(await polkaminePoolManager.poolIndex(pETHMPool.address)).to.be.equal(1);
-  //   });
-  // });
+      expect(await polkaminePoolManager.poolIndex(pBTCMPool.address)).to.be.equal(0);
+      expect(await polkaminePoolManager.poolIndex(pETHMPool.address)).to.be.equal(1);
+    });
+  });
 });
