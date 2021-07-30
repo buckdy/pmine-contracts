@@ -89,25 +89,32 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     uint256 _rewardIndex,
     bytes memory _signature
   ) external override nonReentrant {
+    // check signature depulication
     require(!isUsedSignature[_signature], "Already used signature");
     isUsedSignature[_signature] = true;
 
+    // check reward index
     require(_rewardIndex == rewardIndex, "Invalid reward index");
 
+    // check reward interval
     require(block.timestamp > userLastClaimedAt[msg.sender] + rewardInterval, "Invalid interval");
     userLastClaimedAt[msg.sender] = block.timestamp;
 
+    // check signer
     address maintainer = IPolkamineAddressManager(addressManager).maintainer();
     bytes32 data = keccak256(abi.encodePacked(msg.sender, _pid, _wToken, _amount, _rewardIndex));
     require(data.toEthSignedMessageHash().recover(_signature) == maintainer, "Invalid signer");
 
+    // check pid
     address poolManager = IPolkamineAddressManager(addressManager).poolManagerContract();
     require(_pid < IPolkaminePoolManager(poolManager).poolLength(), "Invalid pid");
 
+    // check wToken
     address pool = IPolkaminePoolManager(poolManager).pools(_pid);
     address rewardToken = IPolkaminePool(pool).wToken();
     require(rewardToken == _wToken, "Unmatched reward token");
 
+    // transfer reward
     userClaimedReward[_pid][msg.sender] += _amount;
     poolClaimedReward[_pid] += _amount;
     require(IERC20Upgradeable(rewardToken).transfer(msg.sender, _amount), "Transfer failure");
