@@ -25,7 +25,7 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     uint256 indexed pid,
     address indexed rewardToken,
     uint256 amount,
-    uint256 _rewardIndex
+    uint256 _claimIndex
   );
 
   /*** Constants ***/
@@ -34,10 +34,10 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
   address public addressManager;
   mapping(uint256 => mapping(address => uint256)) public override userClaimedReward;
   mapping(uint256 => uint256) public override poolClaimedReward;
-  uint256 public rewardIndex;
-  uint256 public rewardInterval;
-  mapping(address => uint256) public userLastClaimedAt;
-  mapping(bytes => bool) public isUsedSignature;
+  mapping(address => mapping(uint256 => uint256)) public userLastClaimedAt;
+  uint256 public claimInterval;
+  uint256 private claimIndex;
+  mapping(bytes => bool) private isUsedSignature;
 
   /*** Contract Logic Starts Here */
 
@@ -56,11 +56,11 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     _;
   }
 
-  function initialize(address _addressManager, uint256 _rewardInterval) public initializer {
+  function initialize(address _addressManager, uint256 _claimInterval) public initializer {
     __ReentrancyGuard_init();
 
     addressManager = _addressManager;
-    rewardInterval = _rewardInterval;
+    claimInterval = _claimInterval;
   }
 
   /**
@@ -78,7 +78,7 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
    * @notice Transfer the staker his reward
    * @param _pid pool index
    * @param _amount token amount to claim
-   * @param _rewardIndex reward index
+   * @param _claimIndex reward index
    * @param _signature message signature
    * @param _amount signature created by the user
    */
@@ -86,23 +86,23 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     uint256 _pid,
     address _wToken,
     uint256 _amount,
-    uint256 _rewardIndex,
+    uint256 _claimIndex,
     bytes memory _signature
   ) external override nonReentrant {
-    // check signature depulication
+    // check signature duplication
     require(!isUsedSignature[_signature], "Already used signature");
     isUsedSignature[_signature] = true;
 
     // check reward index
-    require(_rewardIndex == rewardIndex, "Invalid reward index");
+    require(claimIndex == _claimIndex, "Invalid claim index");
 
     // check reward interval
-    require(block.timestamp > userLastClaimedAt[msg.sender] + rewardInterval, "Invalid interval");
-    userLastClaimedAt[msg.sender] = block.timestamp;
+    require(block.timestamp > userLastClaimedAt[msg.sender][_pid] + claimInterval, "Invalid interval");
+    userLastClaimedAt[msg.sender][_pid] = block.timestamp;
 
     // check signer
     address maintainer = IPolkamineAddressManager(addressManager).maintainer();
-    bytes32 data = keccak256(abi.encodePacked(msg.sender, _pid, _wToken, _amount, _rewardIndex));
+    bytes32 data = keccak256(abi.encodePacked(msg.sender, _pid, _wToken, _amount, _claimIndex));
     require(data.toEthSignedMessageHash().recover(_signature) == maintainer, "Invalid signer");
 
     // check pid
@@ -119,20 +119,20 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     poolClaimedReward[_pid] += _amount;
     require(IERC20Upgradeable(rewardToken).transfer(msg.sender, _amount), "Transfer failure");
 
-    emit Claim(msg.sender, _pid, rewardToken, _amount, _rewardIndex);
+    emit Claim(msg.sender, _pid, rewardToken, _amount, _claimIndex);
   }
 
   /**
    * @notice Set the interval valid between reward claim request
    */
-  function setRewardInterval(uint256 _rewardInterval) external override onlyManager {
-    rewardInterval = _rewardInterval;
+  function setClaimInterval(uint256 _claimInterval) external override onlyManager {
+    claimInterval = _claimInterval;
   }
 
   /**
-   * @notice Set the reward index
+   * @notice Set the claim index
    */
-  function setRewardIndex(uint256 _rewardIndex) external override onlyMaintainer {
-    rewardIndex = _rewardIndex;
+  function setClaimIndex(uint256 _claimIndex) external override onlyMaintainer {
+    claimIndex = _claimIndex;
   }
 }

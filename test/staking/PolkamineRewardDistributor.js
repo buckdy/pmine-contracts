@@ -1,6 +1,15 @@
 const { expect } = require("chai");
-const { upgrades } = require("hardhat");
-const { toRole, increaseTime } = require("../utils");
+const { ethers, upgrades } = require("hardhat");
+const { toRole, increaseTime, ZERO } = require("../utils");
+
+const getSignature = async (signer, beneficiary, pid, rewardToken, rewardAmount, claimIndex) => {
+  let message = ethers.utils.solidityKeccak256(
+    ["address", "uint256", "address", "uint256", "uint256"],
+    [beneficiary, pid, rewardToken, rewardAmount, claimIndex],
+  );
+  let signature = await signer.signMessage(ethers.utils.arrayify(message));
+  return signature;
+};
 
 describe("PolkamineRewardDistributor", () => {
   let pBTCM,
@@ -12,16 +21,19 @@ describe("PolkamineRewardDistributor", () => {
     polkamineAddressManager,
     polkaminePoolManager,
     polkamineRewardDistributor,
-    polkamineRewardOracle,
+    // polkamineRewardOracle,
     pidPBTCM,
-    pidPETHM;
+    pidPETHM,
+    claimInterval;
+
+  let signatureAliceBTC, signatureBobBTC, signatureAliceETH, signatureBobETH;
 
   const MINTER_ROLE = toRole("MINTER_ROLE");
   const BURNER_ROLE = toRole("BURNER_ROLE");
   const MINT_AMOUNT = 100;
 
   beforeEach(async () => {
-    [deployer, alice, bob, manager, rewardDepositor, rewardStatsSubmitter] = await ethers.getSigners();
+    [deployer, alice, bob, manager, rewardDepositor, maintainer] = await ethers.getSigners();
 
     // Deploy PToken
     const PToken = await ethers.getContractFactory("PToken");
@@ -41,7 +53,7 @@ describe("PolkamineRewardDistributor", () => {
     const PolkaminePoolManager = await ethers.getContractFactory("PolkaminePoolManager");
     polkaminePoolManager = await upgrades.deployProxy(PolkaminePoolManager, [polkamineAddressManager.address]);
 
-    // Deploy PolkaminePool and add them to PolkaminePoolManager.
+    // Deploy PolkaminePools and add them to PolkaminePoolManager.
     const PolkaminePool = await ethers.getContractFactory("PolkaminePool");
     pBTCMPool = await upgrades.deployProxy(PolkaminePool, [pBTCM.address, wBTCO.address]);
     pETHMPool = await upgrades.deployProxy(PolkaminePool, [pETHM.address, wETHO.address]);
@@ -52,24 +64,27 @@ describe("PolkamineRewardDistributor", () => {
     await polkaminePoolManager.connect(manager).addPool(pETHMPool.address);
     pidPETHM = 1;
 
+    // initialize claimIndex and claimInterval
+    claimIndex = 0;
+    claimInterval = 43200;
+
     // Deploy PolkamineRewardDistributor ans set the address to PolkamineAddressManager
     const PolkamineRewardDistributor = await ethers.getContractFactory("PolkamineRewardDistributor");
     polkamineRewardDistributor = await upgrades.deployProxy(PolkamineRewardDistributor, [
       polkamineAddressManager.address,
+      claimInterval,
     ]);
 
     await polkamineAddressManager.setRewardDistributorContract(polkamineRewardDistributor.address);
 
-    // Deploy PolkamineRewardOracle ans set the address to PolkamineAddressManager
-    const PolkamineRewardOracle = await ethers.getContractFactory("PolkamineRewardOracle");
-    polkamineRewardOracle = await upgrades.deployProxy(PolkamineRewardOracle, [polkamineAddressManager.address]);
-
-    await polkamineAddressManager.setRewardOracleContract(polkamineRewardOracle.address);
-
-    // Set PoolManager, RewardDepositor and RewardStatsSubmitter
+    // Set PoolManager, RewardDepositor and Maintainer
     await polkamineAddressManager.setPoolManagerContract(polkaminePoolManager.address);
     await polkamineAddressManager.setRewardDepositor(rewardDepositor.address);
-    await polkamineAddressManager.setRewardStatsSubmitter(rewardStatsSubmitter.address);
+    await polkamineAddressManager.setMaintainer(maintainer.address);
+
+    // set claimIndex and claimInterval
+    await polkamineRewardDistributor.connect(maintainer).setClaimIndex(claimIndex);
+    await polkamineRewardDistributor.connect(manager).setClaimInterval(claimInterval);
 
     // Mint pToken and wToken
     await pBTCM.grantRole(MINTER_ROLE, deployer.address);
@@ -85,6 +100,28 @@ describe("PolkamineRewardDistributor", () => {
 
     await wBTCO.mint(rewardDepositor.address, MINT_AMOUNT);
     await wETHO.mint(rewardDepositor.address, MINT_AMOUNT);
+  });
+
+  describe("Claim Interval", async () => {
+    it("Should not set claim interval by non mamanger", async () => {
+      let newClaimInterval = 86400;
+      await expect(polkamineRewardDistributor.setClaimInterval(newClaimInterval)).to.be.revertedWith(
+        "Not polkamine manager",
+      );
+    });
+
+    it("Should set claim interval by mamanger", async () => {
+      expect(await polkamineRewardDistributor.claimInterval()).to.equal(claimInterval);
+
+      let newClaimInterval = 86400;
+      await polkamineRewardDistributor.connect(manager).setClaimInterval(newClaimInterval);
+      expect(await polkamineRewardDistributor.claimInterval()).to.equal(newClaimInterval);
+    });
+
+    it("Should not set claim index by non maintainer", async () => {
+      let newClaimindex = claimIndex + 1;
+      await expect(polkamineRewardDistributor.setClaimIndex(newClaimindex)).to.be.revertedWith("Not maintainer");
+    });
   });
 
   describe("Deposit", async () => {
@@ -106,7 +143,7 @@ describe("PolkamineRewardDistributor", () => {
   });
 
   describe("Claim", async () => {
-    it("Should claim reward token by staker", async () => {
+    it("Should claim rewards by staker", async () => {
       // deposit first rewards
       let wBTCOTotalRewardFirst = 30,
         wETHOTotalRewardFirst = 60;
@@ -116,49 +153,45 @@ describe("PolkamineRewardDistributor", () => {
       await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardFirst);
       await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardFirst);
 
-      // set reward stats
-      await polkamineRewardOracle
-        .connect(rewardStatsSubmitter)
-        .setRewardStats(pidPBTCM, [alice.address, bob.address], [20, 10]);
-      expect(await polkamineRewardOracle.userReward(pidPBTCM, alice.address)).to.equal(20);
-      expect(await polkamineRewardOracle.userReward(pidPBTCM, bob.address)).to.equal(10);
-      expect(await polkamineRewardOracle.poolReward(pidPBTCM)).to.equal(30);
-
-      await polkamineRewardOracle
-        .connect(rewardStatsSubmitter)
-        .setRewardStats(pidPETHM, [alice.address, bob.address], [25, 35]);
-      expect(await polkamineRewardOracle.userReward(pidPETHM, alice.address)).to.equal(25);
-      expect(await polkamineRewardOracle.userReward(pidPETHM, bob.address)).to.equal(35);
-      expect(await polkamineRewardOracle.poolReward(pidPETHM)).to.equal(60);
+      // mock BTC/ETH reward signature
+      signatureAliceBTC = await getSignature(maintainer, alice.address, pidPBTCM, wBTCO.address, 10, claimIndex);
+      signatureBobBTC = await getSignature(maintainer, bob.address, pidPBTCM, wBTCO.address, 10, claimIndex);
+      signatureAliceETH = await getSignature(maintainer, alice.address, pidPETHM, wETHO.address, 20, claimIndex);
+      signatureBobETH = await getSignature(maintainer, bob.address, pidPETHM, wETHO.address, 20, claimIndex);
 
       // claim wBTCO
       expect(await wBTCO.balanceOf(alice.address)).to.equal(0);
       expect(await wBTCO.balanceOf(bob.address)).to.equal(0);
-      await polkamineRewardDistributor.connect(alice).claim(pidPBTCM, 10);
-      await polkamineRewardDistributor.connect(bob).claim(pidPBTCM, 10);
+      await polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wBTCO.address, 10, claimIndex, signatureAliceBTC);
+      await polkamineRewardDistributor.connect(bob).claim(pidPBTCM, wBTCO.address, 10, claimIndex, signatureBobBTC);
       expect(await wBTCO.balanceOf(alice.address)).to.equal(10);
       expect(await wBTCO.balanceOf(bob.address)).to.equal(10);
       expect(await wBTCO.balanceOf(polkamineRewardDistributor.address)).to.equal(10);
 
-      expect(await polkamineRewardDistributor.connect(alice).userClaimableReward(pidPBTCM)).to.equal(10);
-      expect(await polkamineRewardDistributor.connect(bob).userClaimableReward(pidPBTCM)).to.equal(0);
-      expect(await polkamineRewardDistributor.poolClaimableReward(pidPBTCM)).to.equal(10);
+      expect(await polkamineRewardDistributor.userClaimedReward(pidPBTCM, alice.address)).to.equal(10);
+      expect(await polkamineRewardDistributor.connect(bob).userClaimedReward(pidPBTCM, bob.address)).to.equal(10);
+      expect(await polkamineRewardDistributor.poolClaimedReward(pidPBTCM)).to.equal(20);
 
       // claim wETHO
       expect(await wETHO.balanceOf(alice.address)).to.equal(0);
       expect(await wETHO.balanceOf(bob.address)).to.equal(0);
-      await polkamineRewardDistributor.connect(alice).claim(pidPETHM, 20);
-      await polkamineRewardDistributor.connect(bob).claim(pidPETHM, 20);
+      await polkamineRewardDistributor.connect(alice).claim(pidPETHM, wETHO.address, 20, claimIndex, signatureAliceETH);
+      await polkamineRewardDistributor.connect(bob).claim(pidPETHM, wETHO.address, 20, claimIndex, signatureBobETH);
       expect(await wETHO.balanceOf(alice.address)).to.equal(20);
       expect(await wETHO.balanceOf(bob.address)).to.equal(20);
       expect(await wETHO.balanceOf(polkamineRewardDistributor.address)).to.equal(20);
 
-      expect(await polkamineRewardDistributor.connect(alice).userClaimableReward(pidPETHM)).to.equal(5);
-      expect(await polkamineRewardDistributor.connect(bob).userClaimableReward(pidPETHM)).to.equal(15);
-      expect(await polkamineRewardDistributor.poolClaimableReward(pidPETHM)).to.equal(20);
+      expect(await polkamineRewardDistributor.connect(alice).userClaimedReward(pidPETHM, alice.address)).to.equal(20);
+      expect(await polkamineRewardDistributor.connect(bob).userClaimedReward(pidPETHM, bob.address)).to.equal(20);
+      expect(await polkamineRewardDistributor.poolClaimedReward(pidPETHM)).to.equal(40);
+
+      // change the time and incrase claim index
+      increaseTime(claimInterval);
+      claimIndex++;
+      await polkamineRewardDistributor.connect(maintainer).setClaimIndex(claimIndex);
 
       // deposit second rewards
-      let wBTCOTotalRewardSecond = 25,
+      let wBTCOTotalRewardSecond = 50,
         wETHOTotalRewardSecond = 10;
 
       await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardSecond);
@@ -166,100 +199,251 @@ describe("PolkamineRewardDistributor", () => {
       await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardSecond);
       await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardSecond);
 
-      // set reward stats
-      await polkamineRewardOracle
-        .connect(rewardStatsSubmitter)
-        .setRewardStats(pidPBTCM, [alice.address, bob.address], [10, 15]);
-      expect(await polkamineRewardOracle.userReward(pidPBTCM, alice.address)).to.equal(30);
-      expect(await polkamineRewardOracle.userReward(pidPBTCM, bob.address)).to.equal(25);
-      expect(await polkamineRewardOracle.poolReward(pidPBTCM)).to.equal(55);
-
-      await polkamineRewardOracle
-        .connect(rewardStatsSubmitter)
-        .setRewardStats(pidPETHM, [alice.address, bob.address], [3, 7]);
-      expect(await polkamineRewardOracle.userReward(pidPETHM, alice.address)).to.equal(28);
-      expect(await polkamineRewardOracle.userReward(pidPETHM, bob.address)).to.equal(42);
-      expect(await polkamineRewardOracle.poolReward(pidPETHM)).to.equal(70);
-
-      // check claimable reward after deposit
-      expect(await polkamineRewardDistributor.connect(alice).userClaimableReward(pidPBTCM)).to.equal(20);
-      expect(await polkamineRewardDistributor.connect(bob).userClaimableReward(pidPBTCM)).to.equal(15);
-      expect(await polkamineRewardDistributor.poolClaimableReward(pidPBTCM)).to.equal(35);
-
-      expect(await polkamineRewardDistributor.connect(alice).userClaimableReward(pidPETHM)).to.equal(8);
-      expect(await polkamineRewardDistributor.connect(bob).userClaimableReward(pidPETHM)).to.equal(22);
-      expect(await polkamineRewardDistributor.poolClaimableReward(pidPETHM)).to.equal(30);
-
-      // deposit third rewards
-      let wBTCOTotalRewardThird = 25,
-        wETHOTotalRewardThird = 10;
-
-      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardThird);
-      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardThird);
-      await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardThird);
-      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardThird);
-
-      // set reward stats
-      await polkamineRewardOracle
-        .connect(rewardStatsSubmitter)
-        .setRewardStats(pidPBTCM, [alice.address, bob.address], [10, 15]);
-      expect(await polkamineRewardOracle.userReward(pidPBTCM, alice.address)).to.equal(40);
-      expect(await polkamineRewardOracle.userReward(pidPBTCM, bob.address)).to.equal(40);
-      expect(await polkamineRewardOracle.poolReward(pidPBTCM)).to.equal(80);
-
-      await polkamineRewardOracle
-        .connect(rewardStatsSubmitter)
-        .setRewardStats(pidPETHM, [alice.address, bob.address], [2, 8]);
-      expect(await polkamineRewardOracle.userReward(pidPETHM, alice.address)).to.equal(30);
-      expect(await polkamineRewardOracle.userReward(pidPETHM, bob.address)).to.equal(50);
-      expect(await polkamineRewardOracle.poolReward(pidPETHM)).to.equal(80);
+      // mock BTC/ETH reward signature
+      signatureAliceBTC = await getSignature(maintainer, alice.address, pidPBTCM, wBTCO.address, 40, claimIndex);
+      signatureBobBTC = await getSignature(maintainer, bob.address, pidPBTCM, wBTCO.address, 20, claimIndex);
+      signatureAliceETH = await getSignature(maintainer, alice.address, pidPETHM, wETHO.address, 10, claimIndex);
+      signatureBobETH = await getSignature(maintainer, bob.address, pidPETHM, wETHO.address, 20, claimIndex);
 
       // claim wBTCO
       expect(await wBTCO.balanceOf(alice.address)).to.equal(10);
       expect(await wBTCO.balanceOf(bob.address)).to.equal(10);
-      await polkamineRewardDistributor.connect(alice).claim(pidPBTCM, 30);
-      await polkamineRewardDistributor.connect(bob).claim(pidPBTCM, 20);
-      expect(await wBTCO.balanceOf(alice.address)).to.equal(40);
+      await polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wBTCO.address, 40, claimIndex, signatureAliceBTC);
+      await polkamineRewardDistributor.connect(bob).claim(pidPBTCM, wBTCO.address, 20, claimIndex, signatureBobBTC);
+      expect(await wBTCO.balanceOf(alice.address)).to.equal(50);
       expect(await wBTCO.balanceOf(bob.address)).to.equal(30);
-      expect(await wBTCO.balanceOf(polkamineRewardDistributor.address)).to.equal(10);
+      expect(await wBTCO.balanceOf(polkamineRewardDistributor.address)).to.equal(0);
 
-      expect(await polkamineRewardDistributor.connect(alice).userClaimableReward(pidPBTCM)).to.equal(0);
-      expect(await polkamineRewardDistributor.connect(bob).userClaimableReward(pidPBTCM)).to.equal(10);
-      expect(await polkamineRewardDistributor.poolClaimableReward(pidPBTCM)).to.equal(10);
+      expect(await polkamineRewardDistributor.userClaimedReward(pidPBTCM, alice.address)).to.equal(50);
+      expect(await polkamineRewardDistributor.connect(bob).userClaimedReward(pidPBTCM, bob.address)).to.equal(30);
+      expect(await polkamineRewardDistributor.poolClaimedReward(pidPBTCM)).to.equal(80);
 
       // claim wETHO
       expect(await wETHO.balanceOf(alice.address)).to.equal(20);
       expect(await wETHO.balanceOf(bob.address)).to.equal(20);
-      await polkamineRewardDistributor.connect(alice).claim(pidPETHM, 10);
-      await polkamineRewardDistributor.connect(bob).claim(pidPETHM, 20);
+      await polkamineRewardDistributor.connect(alice).claim(pidPETHM, wETHO.address, 10, claimIndex, signatureAliceETH);
+      await polkamineRewardDistributor.connect(bob).claim(pidPETHM, wETHO.address, 20, claimIndex, signatureBobETH);
       expect(await wETHO.balanceOf(alice.address)).to.equal(30);
       expect(await wETHO.balanceOf(bob.address)).to.equal(40);
-      expect(await wETHO.balanceOf(polkamineRewardDistributor.address)).to.equal(10);
+      expect(await wETHO.balanceOf(polkamineRewardDistributor.address)).to.equal(0);
 
-      expect(await polkamineRewardDistributor.connect(alice).userClaimableReward(pidPETHM)).to.equal(0);
-      expect(await polkamineRewardDistributor.connect(bob).userClaimableReward(pidPETHM)).to.equal(10);
-      expect(await polkamineRewardDistributor.poolClaimableReward(pidPETHM)).to.equal(10);
+      expect(await polkamineRewardDistributor.connect(alice).userClaimedReward(pidPETHM, alice.address)).to.equal(30);
+      expect(await polkamineRewardDistributor.connect(bob).userClaimedReward(pidPETHM, bob.address)).to.equal(40);
+      expect(await polkamineRewardDistributor.poolClaimedReward(pidPETHM)).to.equal(70);
     });
 
-    it("Should not claim reward token with the exceeded amount", async () => {
+    it("Should not claim rewards with already used signature", async () => {
       // deposit first rewards
-      let wBTCOTotalRewardFirst = 30,
-        wETHOTotalRewardFirst = 60;
+      let wBTCOTotalRewardSecond = 50,
+        wETHOTotalRewardSecond = 20;
+
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardSecond);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardSecond);
+      await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardSecond);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardSecond);
+
+      // mock BTC/ETH reward signature
+      signatureAliceBTC = await getSignature(maintainer, alice.address, pidPBTCM, wBTCO.address, 40, claimIndex);
+      signatureBobETH = await getSignature(maintainer, bob.address, pidPETHM, wETHO.address, 20, claimIndex);
+
+      // claim wBTCO, WETHO
+      await polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wBTCO.address, 40, claimIndex, signatureAliceBTC);
+      await polkamineRewardDistributor.connect(bob).claim(pidPETHM, wETHO.address, 20, claimIndex, signatureBobETH);
+
+      // retry with the used signature
+      await expect(
+        polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wBTCO.address, 40, claimIndex, signatureAliceBTC),
+      ).to.be.revertedWith("Already used signature");
+      await expect(
+        polkamineRewardDistributor.connect(bob).claim(pidPETHM, wETHO.address, 20, claimIndex, signatureBobETH),
+      ).to.be.revertedWith("Already used signature");
+
+      // retry after changing claim index
+      await polkamineRewardDistributor.connect(maintainer).setClaimIndex(claimIndex);
+      await expect(
+        polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wBTCO.address, 40, claimIndex, signatureAliceBTC),
+      ).to.be.revertedWith("Already used signature");
+      await expect(
+        polkamineRewardDistributor.connect(bob).claim(pidPETHM, wETHO.address, 20, claimIndex, signatureBobETH),
+      ).to.be.revertedWith("Already used signature");
+
+      // retry after increasing the time
+      increaseTime(claimInterval);
+      await expect(
+        polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wBTCO.address, 40, claimIndex, signatureAliceBTC),
+      ).to.be.revertedWith("Already used signature");
+      await expect(
+        polkamineRewardDistributor.connect(bob).claim(pidPETHM, wETHO.address, 20, claimIndex, signatureBobETH),
+      ).to.be.revertedWith("Already used signature");
+    });
+
+    it("Should not claim rewards with invalid interval", async () => {
+      // deposit first rewards
+      let wBTCOTotalRewardFirst = 50,
+        wETHOTotalRewardFirst = 20;
 
       await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardFirst);
       await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardFirst);
+      await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardFirst);
 
-      // set reward stats
-      await polkamineRewardOracle
-        .connect(rewardStatsSubmitter)
-        .setRewardStats(pidPBTCM, [alice.address, bob.address], [20, 10]);
+      // mock BTC/ETH reward signature using invalid claim index
+      signatureAliceBTC = await getSignature(maintainer, alice.address, pidPBTCM, wBTCO.address, 50, claimIndex);
+      signatureBobETH = await getSignature(maintainer, bob.address, pidPETHM, wETHO.address, 20, claimIndex);
 
-      // claim wBTCO
-      let claimAmount = await polkamineRewardDistributor.connect(alice).userClaimableReward(pidPBTCM);
-      claimAmount++;
-      await expect(polkamineRewardDistributor.connect(alice).claim(pidPETHM, claimAmount)).to.be.revertedWith(
-        "Exceeds claim amount",
-      );
+      // claim wBTCO, WETHO
+      await polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wBTCO.address, 50, claimIndex, signatureAliceBTC);
+      await polkamineRewardDistributor.connect(bob).claim(pidPETHM, wETHO.address, 20, claimIndex, signatureBobETH);
+
+      // change the time and increase claim index
+      increaseTime(claimInterval - 10);
+      claimIndex++;
+      await polkamineRewardDistributor.connect(maintainer).setClaimIndex(claimIndex);
+
+      // deposit second rewards
+      let wBTCOTotalRewardSecond = 10,
+        wETHOTotalRewardSecond = 20;
+
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardSecond);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardSecond);
+      await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardSecond);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardSecond);
+
+      // mock BTC/ETH reward signature
+      signatureAliceBTC = await getSignature(maintainer, alice.address, pidPBTCM, wBTCO.address, 10, claimIndex);
+      signatureBobETH = await getSignature(maintainer, bob.address, pidPETHM, wETHO.address, 20, claimIndex);
+
+      // claim wBTCO, WETHO
+      await expect(
+        polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wBTCO.address, 10, claimIndex, signatureAliceBTC),
+      ).to.be.revertedWith("Invalid interval");
+      await expect(
+        polkamineRewardDistributor.connect(bob).claim(pidPETHM, wETHO.address, 20, claimIndex, signatureBobETH),
+      ).to.be.revertedWith("Invalid interval");
+    });
+
+    it("Should not claim rewards with invalid claim index", async () => {
+      // deposit first rewards
+      let wBTCOTotalRewardFirst = 50,
+        wETHOTotalRewardFirst = 20;
+
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardFirst);
+      await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardFirst);
+
+      // set claim index
+      claimIndex = 2;
+      await polkamineRewardDistributor.connect(maintainer).setClaimIndex(claimIndex);
+
+      // set invalid claim index
+      claimIndex--;
+
+      // mock BTC/ETH reward signature using invalid claim index
+      signatureAliceBTC = await getSignature(maintainer, alice.address, pidPBTCM, wBTCO.address, 60, claimIndex);
+      signatureBobETH = await getSignature(maintainer, bob.address, pidPETHM, wETHO.address, 30, claimIndex);
+
+      // claim wBTCO, WETHO
+      await expect(
+        polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wBTCO.address, 60, claimIndex, signatureAliceBTC),
+      ).to.be.revertedWith("Invalid claim index");
+      await expect(
+        polkamineRewardDistributor.connect(bob).claim(pidPETHM, wETHO.address, 30, claimIndex, signatureBobETH),
+      ).to.be.revertedWith("Invalid claim index");
+    });
+
+    it("Should not claim rewards with the signature made by invalid signer", async () => {
+      // deposit first rewards
+      let wBTCOTotalRewardFirst = 50,
+        wETHOTotalRewardFirst = 20;
+
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardFirst);
+      await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardFirst);
+
+      // mock BTC/ETH reward signature using invalid claim index
+      signatureAliceBTC = await getSignature(alice, alice.address, pidPBTCM, wBTCO.address, 60, claimIndex);
+      signatureBobETH = await getSignature(bob, bob.address, pidPETHM, wETHO.address, 30, claimIndex);
+
+      // claim wBTCO, WETHO
+      await expect(
+        polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wBTCO.address, 60, claimIndex, signatureAliceBTC),
+      ).to.be.revertedWith("Invalid signer");
+      await expect(
+        polkamineRewardDistributor.connect(bob).claim(pidPETHM, wETHO.address, 30, claimIndex, signatureBobETH),
+      ).to.be.revertedWith("Invalid signer");
+    });
+
+    it("Should not claim rewards with invalid pid", async () => {
+      // deposit first rewards
+      let wBTCOTotalRewardFirst = 50,
+        wETHOTotalRewardFirst = 20;
+
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardFirst);
+      await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardFirst);
+
+      // mock BTC/ETH reward signature using invalid claim index
+      signatureAliceBTC = await getSignature(maintainer, alice.address, pidPBTCM + 10, wBTCO.address, 60, claimIndex);
+      signatureBobETH = await getSignature(maintainer, bob.address, pidPETHM + 10, wETHO.address, 30, claimIndex);
+
+      // claim wBTCO, WETHO
+      await expect(
+        polkamineRewardDistributor
+          .connect(alice)
+          .claim(pidPBTCM + 10, wBTCO.address, 60, claimIndex, signatureAliceBTC),
+      ).to.be.revertedWith("Invalid pid");
+      await expect(
+        polkamineRewardDistributor.connect(bob).claim(pidPETHM + 10, wETHO.address, 30, claimIndex, signatureBobETH),
+      ).to.be.revertedWith("Invalid pid");
+    });
+
+    it("Should not claim rewards with unmatched reward token", async () => {
+      // deposit first rewards
+      let wBTCOTotalRewardFirst = 50,
+        wETHOTotalRewardFirst = 20;
+
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardFirst);
+      await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardFirst);
+
+      // mock BTC/ETH reward signature using invalid claim index
+      signatureAliceBTC = await getSignature(maintainer, alice.address, pidPBTCM, wETHO.address, 60, claimIndex);
+      signatureBobETH = await getSignature(maintainer, bob.address, pidPETHM, wBTCO.address, 30, claimIndex);
+
+      // claim wBTCO, WETHO
+      await expect(
+        polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wETHO.address, 60, claimIndex, signatureAliceBTC),
+      ).to.be.revertedWith("Unmatched reward token");
+      await expect(
+        polkamineRewardDistributor.connect(bob).claim(pidPETHM, wBTCO.address, 30, claimIndex, signatureBobETH),
+      ).to.be.revertedWith("Unmatched reward token");
+    });
+
+    it("Should not claim rewards with the exceeded amount", async () => {
+      // deposit first rewards
+      let wBTCOTotalRewardFirst = 50,
+        wETHOTotalRewardFirst = 20;
+
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, wBTCOTotalRewardFirst);
+      await wETHO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wETHOTotalRewardFirst);
+      await polkamineRewardDistributor.connect(rewardDepositor).deposit(wETHO.address, wETHOTotalRewardFirst);
+
+      // mock BTC/ETH reward signature
+      signatureAliceBTC = await getSignature(maintainer, alice.address, pidPBTCM, wBTCO.address, 60, claimIndex);
+      signatureBobETH = await getSignature(maintainer, bob.address, pidPETHM, wETHO.address, 30, claimIndex);
+
+      // claim wBTCO, WETHO
+      await expect(
+        polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wBTCO.address, 60, claimIndex, signatureAliceBTC),
+      ).to.be.revertedWith("ERC20: transfer amount exceeds balance");
+      await expect(
+        polkamineRewardDistributor.connect(bob).claim(pidPETHM, wETHO.address, 30, claimIndex, signatureBobETH),
+      ).to.be.revertedWith("ERC20: transfer amount exceeds balance");
     });
   });
 });

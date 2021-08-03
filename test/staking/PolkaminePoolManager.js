@@ -49,7 +49,7 @@ describe("Polkamine Pool Manage", () => {
     const PolkamineRewardDistributor = await ethers.getContractFactory("PolkamineRewardDistributor");
     polkamineRewardDistributor = await upgrades.deployProxy(PolkamineRewardDistributor, [
       polkamineAddressManager.address,
-      rewardInterval
+      rewardInterval,
     ]);
 
     await polkamineAddressManager.setManager(manager.address);

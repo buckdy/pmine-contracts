@@ -1,4 +1,4 @@
-const { hre } = require("hardhat");
+const hre = require("hardhat");
 
 const increaseTime = async (sec) => {
   await hre.network.provider.send("evm_increaseTime", [sec]);

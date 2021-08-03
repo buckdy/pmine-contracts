@@ -21,6 +21,19 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32",
+        "name": "c__0x9dc347cd",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x9dc347cd",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_manager",
         "type": "address"
