@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.
 import "../interfaces/IPolkamineRewardDistributor.sol";
 import "../interfaces/IPolkaminePoolManager.sol";
 import "../interfaces/IPolkaminePool.sol";
-import "../interfaces/IPolkamineAddressManager.sol";
+import "../interfaces/IPolkamineAdmin.sol";
 
 /**
  * @title Polkamine's Reward Distributor Contract
@@ -42,17 +42,17 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
   /*** Contract Logic Starts Here */
 
   modifier onlyManager() {
-    require(msg.sender == IPolkamineAddressManager(addressManager).manager(), "Not polkamine manager");
+    require(msg.sender == IPolkamineAdmin(addressManager).manager(), "Not polkamine manager");
     _;
   }
 
   modifier onlyRewardDepositor() {
-    require(msg.sender == IPolkamineAddressManager(addressManager).rewardDepositor(), "Not reward depositor");
+    require(msg.sender == IPolkamineAdmin(addressManager).rewardDepositor(), "Not reward depositor");
     _;
   }
 
   modifier onlyMaintainer() {
-    require(msg.sender == IPolkamineAddressManager(addressManager).maintainer(), "Not maintainer");
+    require(msg.sender == IPolkamineAdmin(addressManager).maintainer(), "Not maintainer");
     _;
   }
 
@@ -101,12 +101,12 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     userLastClaimedAt[msg.sender][_pid] = block.timestamp;
 
     // check signer
-    address maintainer = IPolkamineAddressManager(addressManager).maintainer();
+    address maintainer = IPolkamineAdmin(addressManager).maintainer();
     bytes32 data = keccak256(abi.encodePacked(msg.sender, _pid, _wToken, _amount, _claimIndex));
     require(data.toEthSignedMessageHash().recover(_signature) == maintainer, "Invalid signer");
 
     // check pid
-    address poolManager = IPolkamineAddressManager(addressManager).poolManagerContract();
+    address poolManager = IPolkamineAdmin(addressManager).poolManagerContract();
     require(_pid < IPolkaminePoolManager(poolManager).poolLength(), "Invalid pid");
 
     // check wToken

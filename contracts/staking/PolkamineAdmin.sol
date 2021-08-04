@@ -3,13 +3,13 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "../interfaces/IPolkamineAddressManager.sol";
+import "../interfaces/IPolkamineAdmin.sol";
 
 /**
- * @title Polkamine's Address Manager contract
+ * @title Polkamine's Admin contract
  * @author Polkamine
  */
-contract PolkamineAddressManager is IPolkamineAddressManager, OwnableUpgradeable {
+contract PolkamineAdmin is IPolkamineAdmin, OwnableUpgradeable {
   /*** Storage Properties ***/
 
   // polkamine manager addresses

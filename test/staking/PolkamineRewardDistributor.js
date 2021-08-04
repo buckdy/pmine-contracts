@@ -18,7 +18,7 @@ describe("PolkamineRewardDistributor", () => {
     wETHO,
     pBTCMPool,
     pETHMPool,
-    polkamineAddressManager,
+    polkamineAdmin,
     polkaminePoolManager,
     polkamineRewardDistributor,
     // polkamineRewardOracle,
@@ -45,13 +45,13 @@ describe("PolkamineRewardDistributor", () => {
     wBTCO = await upgrades.deployProxy(WToken, ["wBTCO", "wBTCO"]);
     wETHO = await upgrades.deployProxy(WToken, ["wETHO", "wETHO"]);
 
-    // Deploy PolkamineAddressManager
-    const PolkamineAddressManager = await ethers.getContractFactory("PolkamineAddressManager");
-    polkamineAddressManager = await upgrades.deployProxy(PolkamineAddressManager, [manager.address]);
+    // Deploy PolkamineAdmin
+    const PolkamineAdmin = await ethers.getContractFactory("PolkamineAdmin");
+    polkamineAdmin = await upgrades.deployProxy(PolkamineAdmin, [manager.address]);
 
     // Deploy PolkaminePoolManager
     const PolkaminePoolManager = await ethers.getContractFactory("PolkaminePoolManager");
-    polkaminePoolManager = await upgrades.deployProxy(PolkaminePoolManager, [polkamineAddressManager.address]);
+    polkaminePoolManager = await upgrades.deployProxy(PolkaminePoolManager, [polkamineAdmin.address]);
 
     // Deploy PolkaminePools and add them to PolkaminePoolManager.
     const PolkaminePool = await ethers.getContractFactory("PolkaminePool");
@@ -68,19 +68,19 @@ describe("PolkamineRewardDistributor", () => {
     claimIndex = 0;
     claimInterval = 43200;
 
-    // Deploy PolkamineRewardDistributor ans set the address to PolkamineAddressManager
+    // Deploy PolkamineRewardDistributor ans set the address to PolkamineAdmin
     const PolkamineRewardDistributor = await ethers.getContractFactory("PolkamineRewardDistributor");
     polkamineRewardDistributor = await upgrades.deployProxy(PolkamineRewardDistributor, [
-      polkamineAddressManager.address,
+      polkamineAdmin.address,
       claimInterval,
     ]);
 
-    await polkamineAddressManager.setRewardDistributorContract(polkamineRewardDistributor.address);
+    await polkamineAdmin.setRewardDistributorContract(polkamineRewardDistributor.address);
 
     // Set PoolManager, RewardDepositor and Maintainer
-    await polkamineAddressManager.setPoolManagerContract(polkaminePoolManager.address);
-    await polkamineAddressManager.setRewardDepositor(rewardDepositor.address);
-    await polkamineAddressManager.setMaintainer(maintainer.address);
+    await polkamineAdmin.setPoolManagerContract(polkaminePoolManager.address);
+    await polkamineAdmin.setRewardDepositor(rewardDepositor.address);
+    await polkamineAdmin.setMaintainer(maintainer.address);
 
     // set claimIndex and claimInterval
     await polkamineRewardDistributor.connect(maintainer).setClaimIndex(claimIndex);

@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IPolkaminePoolManager.sol";
-import "../interfaces/IPolkamineAddressManager.sol";
+import "../interfaces/IPolkamineAdmin.sol";
 
 /**
  * @title Polkamine's Pool Manager contract
@@ -25,7 +25,7 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable {
   /*** Contract Logic Starts Here */
 
   modifier onlyManager() {
-    require(msg.sender == IPolkamineAddressManager(addressManager).manager(), "Not polkamine manager");
+    require(msg.sender == IPolkamineAdmin(addressManager).manager(), "Not polkamine manager");
     _;
   }
 
