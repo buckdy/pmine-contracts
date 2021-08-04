@@ -3,22 +3,21 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "../interfaces/IPolkamineAddressManager.sol";
+import "../interfaces/IPolkamineAdmin.sol";
 
 /**
- * @title Polkamine's Address Manager contract
- * @author icrabbiter
+ * @title Polkamine's Admin contract
+ * @author Polkamine
  */
-contract PolkamineAddressManager is IPolkamineAddressManager, OwnableUpgradeable {
+contract PolkamineAdmin is IPolkamineAdmin, OwnableUpgradeable {
   /*** Storage Properties ***/
 
   // polkamine manager addresses
   address public override manager;
-  address public override rewardStatsSubmitter;
   address public override rewardDepositor;
+  address public override maintainer;
 
   // polkamine contracts
-  address public override rewardOracleContract;
   address public override rewardDistributorContract;
   address public override poolManagerContract;
 
@@ -39,27 +38,11 @@ contract PolkamineAddressManager is IPolkamineAddressManager, OwnableUpgradeable
   }
 
   /**
-   * @notice set reward stats submitter
-   * @param _rewardStatsSubmitter the submitter address
-   */
-  function setRewardStatsSubmitter(address _rewardStatsSubmitter) external onlyOwner {
-    rewardStatsSubmitter = _rewardStatsSubmitter;
-  }
-
-  /**
    * @notice set reward depositor
    * @param _rewardDepositor the depositor address
    */
   function setRewardDepositor(address _rewardDepositor) external onlyOwner {
     rewardDepositor = _rewardDepositor;
-  }
-
-  /**
-   * @notice set reward oracle contract
-   * @param _rewardOracleContract the reward oracle contract address
-   */
-  function setRewardOracleContract(address _rewardOracleContract) external onlyOwner {
-    rewardOracleContract = _rewardOracleContract;
   }
 
   /**
@@ -76,5 +59,13 @@ contract PolkamineAddressManager is IPolkamineAddressManager, OwnableUpgradeable
    */
   function setPoolManagerContract(address _poolManagerContract) external onlyOwner {
     poolManagerContract = _poolManagerContract;
+  }
+
+  /**
+   * @notice set maintainer address
+   * @param _maintainer maintainer address
+   */
+  function setMaintainer(address _maintainer) external onlyOwner {
+    maintainer = _maintainer;
   }
 }

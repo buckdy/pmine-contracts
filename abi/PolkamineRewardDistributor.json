@@ -10,6 +10,12 @@
       },
       {
         "indexed": true,
+        "internalType": "uint256",
+        "name": "pid",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
         "internalType": "address",
         "name": "rewardToken",
         "type": "address"
@@ -18,6 +24,12 @@
         "indexed": false,
         "internalType": "uint256",
         "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_claimIndex",
         "type": "uint256"
       }
     ],
@@ -66,11 +78,11 @@
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "c__0xff4582f9",
+        "name": "c__0xfda1b3d0",
         "type": "bytes32"
       }
     ],
-    "name": "c_0xff4582f9",
+    "name": "c_0xfda1b3d0",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -83,14 +95,42 @@
         "type": "uint256"
       },
       {
+        "internalType": "address",
+        "name": "_wToken",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "_amount",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_claimIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "_signature",
+        "type": "bytes"
       }
     ],
     "name": "claim",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimInterval",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -117,30 +157,16 @@
         "internalType": "address",
         "name": "_addressManager",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_claimInterval",
+        "type": "uint256"
       }
     ],
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_pid",
-        "type": "uint256"
-      }
-    ],
-    "name": "poolClaimableReward",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -166,19 +192,26 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_pid",
+        "name": "_claimIndex",
         "type": "uint256"
       }
     ],
-    "name": "userClaimableReward",
-    "outputs": [
+    "name": "setClaimIndex",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "_claimInterval",
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "name": "setClaimInterval",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -195,6 +228,30 @@
       }
     ],
     "name": "userClaimedReward",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "userLastClaimedAt",
     "outputs": [
       {
         "internalType": "uint256",

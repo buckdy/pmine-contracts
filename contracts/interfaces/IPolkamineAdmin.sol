@@ -1,14 +1,12 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-interface IPolkamineAddressManager {
+interface IPolkamineAdmin {
   function manager() external view returns (address);
-
-  function rewardStatsSubmitter() external view returns (address);
 
   function rewardDepositor() external view returns (address);
 
-  function rewardOracleContract() external view returns (address);
+  function maintainer() external view returns (address);
 
   function rewardDistributorContract() external view returns (address);
 

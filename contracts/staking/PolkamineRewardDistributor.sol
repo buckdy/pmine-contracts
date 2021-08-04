@@ -3,12 +3,12 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
 
 import "../interfaces/IPolkamineRewardDistributor.sol";
-import "../interfaces/IPolkamineRewardOracle.sol";
 import "../interfaces/IPolkaminePoolManager.sol";
 import "../interfaces/IPolkaminePool.sol";
-import "../interfaces/IPolkamineAddressManager.sol";
+import "../interfaces/IPolkamineAdmin.sol";
 
 /**
  * @title Polkamine's Reward Distributor Contract
@@ -16,9 +16,17 @@ import "../interfaces/IPolkamineAddressManager.sol";
  * @author Polkamine
  */
 contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGuardUpgradeable {
+  using ECDSAUpgradeable for bytes32;
+
   /*** Events ***/
   event Deposit(address indexed from, address indexed rewardToken, uint256 amount);
-  event Claim(address indexed beneficiary, address indexed rewardToken, uint256 amount);
+  event Claim(
+    address indexed beneficiary,
+    uint256 indexed pid,
+    address indexed rewardToken,
+    uint256 amount,
+    uint256 _claimIndex
+  );
 
   /*** Constants ***/
 
@@ -26,18 +34,33 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
   address public addressManager;
   mapping(uint256 => mapping(address => uint256)) public override userClaimedReward;
   mapping(uint256 => uint256) public override poolClaimedReward;
+  mapping(address => mapping(uint256 => uint256)) public userLastClaimedAt;
+  uint256 public claimInterval;
+  uint256 private claimIndex;
+  mapping(bytes => bool) private isUsedSignature;
 
   /*** Contract Logic Starts Here */
 
-  modifier onlyRewardDepositor() {
-    require(msg.sender == IPolkamineAddressManager(addressManager).rewardDepositor(), "Not reward depositor");
+  modifier onlyManager() {
+    require(msg.sender == IPolkamineAdmin(addressManager).manager(), "Not polkamine manager");
     _;
   }
 
-  function initialize(address _addressManager) public initializer {
+  modifier onlyRewardDepositor() {
+    require(msg.sender == IPolkamineAdmin(addressManager).rewardDepositor(), "Not reward depositor");
+    _;
+  }
+
+  modifier onlyMaintainer() {
+    require(msg.sender == IPolkamineAdmin(addressManager).maintainer(), "Not maintainer");
+    _;
+  }
+
+  function initialize(address _addressManager, uint256 _claimInterval) public initializer {
     __ReentrancyGuard_init();
 
     addressManager = _addressManager;
+    claimInterval = _claimInterval;
   }
 
   /**
@@ -54,42 +77,62 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
   /**
    * @notice Transfer the staker his reward
    * @param _pid pool index
-   * @param _amount reward token amount to claim
+   * @param _amount token amount to claim
+   * @param _claimIndex reward index
+   * @param _signature message signature
+   * @param _amount signature created by the user
    */
-  function claim(uint256 _pid, uint256 _amount) external override nonReentrant {
-    address poolManager = IPolkamineAddressManager(addressManager).poolManagerContract();
+  function claim(
+    uint256 _pid,
+    address _wToken,
+    uint256 _amount,
+    uint256 _claimIndex,
+    bytes memory _signature
+  ) external override nonReentrant {
+    // check signature duplication
+    require(!isUsedSignature[_signature], "Already used signature");
+    isUsedSignature[_signature] = true;
 
-    require(_amount <= userClaimableReward(_pid), "Exceeds claim amount");
+    // check reward index
+    require(claimIndex == _claimIndex, "Invalid claim index");
 
+    // check reward interval
+    require(block.timestamp > userLastClaimedAt[msg.sender][_pid] + claimInterval, "Invalid interval");
+    userLastClaimedAt[msg.sender][_pid] = block.timestamp;
+
+    // check signer
+    address maintainer = IPolkamineAdmin(addressManager).maintainer();
+    bytes32 data = keccak256(abi.encodePacked(msg.sender, _pid, _wToken, _amount, _claimIndex));
+    require(data.toEthSignedMessageHash().recover(_signature) == maintainer, "Invalid signer");
+
+    // check pid
+    address poolManager = IPolkamineAdmin(addressManager).poolManagerContract();
+    require(_pid < IPolkaminePoolManager(poolManager).poolLength(), "Invalid pid");
+
+    // check wToken
     address pool = IPolkaminePoolManager(poolManager).pools(_pid);
     address rewardToken = IPolkaminePool(pool).wToken();
+    require(rewardToken == _wToken, "Unmatched reward token");
 
+    // transfer reward
     userClaimedReward[_pid][msg.sender] += _amount;
     poolClaimedReward[_pid] += _amount;
     require(IERC20Upgradeable(rewardToken).transfer(msg.sender, _amount), "Transfer failure");
 
-    emit Claim(msg.sender, rewardToken, _amount);
+    emit Claim(msg.sender, _pid, rewardToken, _amount, _claimIndex);
   }
 
   /**
-   * @notice Return user's claimable reward on the specific pool
-   * @param _pid pool index
-   * @return (uint256) user's claimable reward
+   * @notice Set the interval valid between reward claim request
    */
-  function userClaimableReward(uint256 _pid) public view override returns (uint256) {
-    address rewardOracle = IPolkamineAddressManager(addressManager).rewardOracleContract();
-
-    return IPolkamineRewardOracle(rewardOracle).userReward(_pid, msg.sender) - userClaimedReward[_pid][msg.sender];
+  function setClaimInterval(uint256 _claimInterval) external override onlyManager {
+    claimInterval = _claimInterval;
   }
 
   /**
-   * @notice Return the claimable reward on the specific pool
-   * @param _pid pool index
-   * @return (uint256) claimable reward on the pool
+   * @notice Set the claim index
    */
-  function poolClaimableReward(uint256 _pid) external view override returns (uint256) {
-    address rewardOracle = IPolkamineAddressManager(addressManager).rewardOracleContract();
-
-    return IPolkamineRewardOracle(rewardOracle).poolReward(_pid) - poolClaimedReward[_pid];
+  function setClaimIndex(uint256 _claimIndex) external override onlyMaintainer {
+    claimIndex = _claimIndex;
   }
 }

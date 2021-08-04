@@ -3,7 +3,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
         "name": "user",
         "type": "address"
@@ -28,7 +28,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
         "name": "user",
         "type": "address"
@@ -53,11 +53,11 @@
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "c__0xe2ba4380",
+        "name": "c__0x41314b2e",
         "type": "bytes32"
       }
     ],
-    "name": "c_0xe2ba4380",
+    "name": "c_0x41314b2e",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"

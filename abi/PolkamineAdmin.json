@@ -22,11 +22,11 @@
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "c__0x8517d416",
+        "name": "c__0x4e3cf3b9",
         "type": "bytes32"
       }
     ],
-    "name": "c_0x8517d416",
+    "name": "c_0x4e3cf3b9",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"
@@ -42,6 +42,19 @@
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maintainer",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -117,29 +130,16 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "rewardOracleContract",
-    "outputs": [
+    "inputs": [
       {
         "internalType": "address",
-        "name": "",
+        "name": "_maintainer",
         "type": "address"
       }
     ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "rewardStatsSubmitter",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "setMaintainer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -190,32 +190,6 @@
       }
     ],
     "name": "setRewardDistributorContract",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_rewardOracleContract",
-        "type": "address"
-      }
-    ],
-    "name": "setRewardOracleContract",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_rewardStatsSubmitter",
-        "type": "address"
-      }
-    ],
-    "name": "setRewardStatsSubmitter",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

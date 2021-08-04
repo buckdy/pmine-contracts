@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
 /**
  * @notice pToken Contract
+ * @author Polkamine
  */
 contract PToken is ERC20Upgradeable, AccessControlUpgradeable {
   /*** Events ***/

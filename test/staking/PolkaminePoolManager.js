@@ -9,17 +9,17 @@ describe("Polkamine Pool Manage", () => {
     wETHO,
     pBTCMPool,
     pETHMPool,
-    polkamineAddressManager,
+    PolkamineAdmin,
     polkaminePoolManager,
     polkamineRewardDistributor,
-    polkamineRewardOracle;
+    rewardInterval;
 
   const MINTER_ROLE = toRole("MINTER_ROLE");
   const BURNER_ROLE = toRole("BURNER_ROLE");
   const MINT_AMOUNT = 100;
 
   before(async () => {
-    [deployer, alice, bob, manager, rewardDepositor, rewardStatsSubmitter] = await ethers.getSigners();
+    [deployer, alice, bob, manager, rewardDepositor, maintainer] = await ethers.getSigners();
 
     // Deploy PToken
     const PToken = await ethers.getContractFactory("PToken");
@@ -31,39 +31,35 @@ describe("Polkamine Pool Manage", () => {
     wBTCO = await upgrades.deployProxy(WToken, ["wBTCO", "wBTCO"]);
     wETHO = await upgrades.deployProxy(WToken, ["wETHO", "wETHO"]);
 
-    // Deploy PolkamineAddressManager
-    const PolkamineAddressManager = await ethers.getContractFactory("PolkamineAddressManager");
-    polkamineAddressManager = await upgrades.deployProxy(PolkamineAddressManager, [manager.address]);
+    // Deploy PolkamineAdmin
+    const PolkamineAdmin = await ethers.getContractFactory("PolkamineAdmin");
+    polkamineAdmin = await upgrades.deployProxy(PolkamineAdmin, [manager.address]);
 
     // Deploy PolkaminePoolManager
     const PolkaminePoolManager = await ethers.getContractFactory("PolkaminePoolManager");
-    polkaminePoolManager = await upgrades.deployProxy(PolkaminePoolManager, [polkamineAddressManager.address]);
+    polkaminePoolManager = await upgrades.deployProxy(PolkaminePoolManager, [polkamineAdmin.address]);
 
-    // Deploy PolkaminePools.
+    // Deploy PolkaminePools
     const PolkaminePool = await ethers.getContractFactory("PolkaminePool");
     pBTCMPool = await upgrades.deployProxy(PolkaminePool, [pBTCM.address, wBTCO.address]);
     pETHMPool = await upgrades.deployProxy(PolkaminePool, [pETHM.address, wETHO.address]);
 
-    // Deploy PolkamineRewardDistributor ans set the address to PolkamineAddressManager
+    // Deploy PolkamineRewardDistributor ans set the address to PolkamineAdmin
+    rewardInterval = 43200; // half day
     const PolkamineRewardDistributor = await ethers.getContractFactory("PolkamineRewardDistributor");
     polkamineRewardDistributor = await upgrades.deployProxy(PolkamineRewardDistributor, [
-      polkamineAddressManager.address,
+      polkamineAdmin.address,
+      rewardInterval,
     ]);
 
-    await polkamineAddressManager.setManager(manager.address);
+    await polkamineAdmin.setManager(manager.address);
 
-    await polkamineAddressManager.setRewardDistributorContract(polkamineRewardDistributor.address);
+    await polkamineAdmin.setRewardDistributorContract(polkamineRewardDistributor.address);
 
-    // Deploy PolkamineRewardOracle ans set the address to PolkamineAddressManager
-    const PolkamineRewardOracle = await ethers.getContractFactory("PolkamineRewardOracle");
-    polkamineRewardOracle = await upgrades.deployProxy(PolkamineRewardOracle, [polkamineAddressManager.address]);
-
-    await polkamineAddressManager.setRewardOracleContract(polkamineRewardOracle.address);
-
-    // Set PoolManager, RewardDepositor and RewardStatsSubmitter
-    await polkamineAddressManager.setPoolManagerContract(polkaminePoolManager.address);
-    await polkamineAddressManager.setRewardDepositor(rewardDepositor.address);
-    await polkamineAddressManager.setRewardStatsSubmitter(rewardStatsSubmitter.address);
+    // Set PoolManager, RewardDepositor and Maintainer
+    await polkamineAdmin.setPoolManagerContract(polkaminePoolManager.address);
+    await polkamineAdmin.setRewardDepositor(rewardDepositor.address);
+    await polkamineAdmin.setMaintainer(maintainer.address);
 
     // Mint pToken and wToken
     await pBTCM.grantRole(MINTER_ROLE, deployer.address);
@@ -86,6 +82,7 @@ describe("Polkamine Pool Manage", () => {
       expect(await pBTCMPool.pToken()).to.be.equal(pBTCM.address);
       expect(await pBTCMPool.wToken()).to.be.equal(wBTCO.address);
     });
+
     it("Should be able to stake", async () => {
       await expect(pBTCMPool.connect(alice).stake(10)).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
 
@@ -115,7 +112,7 @@ describe("Polkamine Pool Manage", () => {
 
   describe("PolkaminePoolManager", () => {
     it("Should initialize", async () => {
-      expect(await polkaminePoolManager.addressManager()).to.be.equal(polkamineAddressManager.address);
+      expect(await polkaminePoolManager.addressManager()).to.be.equal(polkamineAdmin.address);
     });
 
     it("Should be able to add pool", async () => {
