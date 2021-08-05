@@ -43,7 +43,8 @@ contract PToken is ERC20Upgradeable, AccessControlUpgradeable {
   }
 
   /**
-   * @notice Burn `amount` tokens from the caller.
+   * @notice Burn `amount` tokens from the caller
+   * @param amount token amount to burn
    */
   function burn(uint256 amount) external virtual {
     _burn(msg.sender, amount);
