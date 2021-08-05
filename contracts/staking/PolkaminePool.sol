@@ -5,6 +5,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "../interfaces/IPolkaminePool.sol";
+import "../interfaces/IPolkamineAdmin.sol";
 
 /**
  * @title Polkamine's Pool contract
@@ -18,25 +19,36 @@ contract PolkaminePool is IPolkaminePool, ReentrancyGuardUpgradeable {
   /*** Constants ***/
 
   /*** Storage Properties ***/
-  address public pToken;
-  address public override wToken;
+  address public override depositToken;
+  address public override rewardToken;
   mapping(address => uint256) public userStakes;
+  address public addressManager;
 
   /*** Contract Logic Starts Here */
 
-  function initialize(address _pToken, address _wToken) public initializer {
+  modifier onlyUnpaused() {
+    require(!IPolkamineAdmin(addressManager).paused(), "Paused");
+    _;
+  }
+
+  function initialize(
+    address _addressManager,
+    address _depositToken,
+    address _rewardToken
+  ) public initializer {
     __ReentrancyGuard_init();
 
-    pToken = _pToken;
-    wToken = _wToken;
+    addressManager = _addressManager;
+    depositToken = _depositToken;
+    rewardToken = _rewardToken;
   }
 
   /**
-   * @notice stake pToken
+   * @notice stake depositToken
    * @param _amount the stake amount
    */
-  function stake(uint256 _amount) external override {
-    require(IERC20Upgradeable(pToken).transferFrom(msg.sender, address(this), _amount), "Transfer failure");
+  function stake(uint256 _amount) external override onlyUnpaused {
+    require(IERC20Upgradeable(depositToken).transferFrom(msg.sender, address(this), _amount), "Transfer failure");
 
     userStakes[msg.sender] += _amount;
 
@@ -44,14 +56,14 @@ contract PolkaminePool is IPolkaminePool, ReentrancyGuardUpgradeable {
   }
 
   /**
-   * @notice unstake pToken
+   * @notice unstake depositToken
    * @param _amount the unstake amount
    */
-  function unstake(uint256 _amount) external override nonReentrant {
+  function unstake(uint256 _amount) external override nonReentrant onlyUnpaused {
     require(_amount <= userStakes[msg.sender], "Invalid amount");
 
     userStakes[msg.sender] -= _amount;
-    require(IERC20Upgradeable(pToken).transfer(msg.sender, _amount), "Transfer failure");
+    require(IERC20Upgradeable(depositToken).transfer(msg.sender, _amount), "Transfer failure");
 
     emit Unstake(msg.sender, _amount, block.timestamp);
   }

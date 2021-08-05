@@ -55,8 +55,8 @@ describe("PolkamineRewardDistributor", () => {
 
     // Deploy PolkaminePools and add them to PolkaminePoolManager.
     const PolkaminePool = await ethers.getContractFactory("PolkaminePool");
-    pBTCMPool = await upgrades.deployProxy(PolkaminePool, [pBTCM.address, wBTCO.address]);
-    pETHMPool = await upgrades.deployProxy(PolkaminePool, [pETHM.address, wETHO.address]);
+    pBTCMPool = await upgrades.deployProxy(PolkaminePool, [polkamineAdmin.address, pBTCM.address, wBTCO.address]);
+    pETHMPool = await upgrades.deployProxy(PolkaminePool, [polkamineAdmin.address, pETHM.address, wETHO.address]);
 
     await polkaminePoolManager.connect(manager).addPool(pBTCMPool.address);
     pidPBTCM = 0;
@@ -86,7 +86,7 @@ describe("PolkamineRewardDistributor", () => {
     await polkamineRewardDistributor.connect(maintainer).setClaimIndex(claimIndex);
     await polkamineRewardDistributor.connect(manager).setClaimInterval(claimInterval);
 
-    // Mint pToken and wToken
+    // Mint depositToken and rewardToken
     await pBTCM.grantRole(MINTER_ROLE, deployer.address);
     await pETHM.grantRole(MINTER_ROLE, deployer.address);
 
@@ -125,6 +125,14 @@ describe("PolkamineRewardDistributor", () => {
   });
 
   describe("Deposit", async () => {
+    it("Should not deposit reward token when paused", async () => {
+      await polkamineAdmin.connect(manager).pause();
+      await expect(
+        polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, MINT_AMOUNT),
+      ).to.be.revertedWith("Paused");
+      await polkamineAdmin.connect(manager).unpause();
+    });
+
     it("Should not deposit reward token by non rewardDepositor", async () => {
       await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, MINT_AMOUNT);
       await expect(polkamineRewardDistributor.deposit(wBTCO.address, MINT_AMOUNT)).to.be.revertedWith(
@@ -132,7 +140,7 @@ describe("PolkamineRewardDistributor", () => {
       );
     });
 
-    it("Should deposit reward token", async () => {
+    it("Should deposit reward token when unpaused", async () => {
       expect(await wBTCO.balanceOf(rewardDepositor.address)).to.equal(MINT_AMOUNT);
       expect(await wBTCO.balanceOf(polkamineRewardDistributor.address)).to.equal(0);
       await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, MINT_AMOUNT);
@@ -143,7 +151,23 @@ describe("PolkamineRewardDistributor", () => {
   });
 
   describe("Claim", async () => {
-    it("Should claim rewards by staker", async () => {
+    it("Should not claim rewards when paused", async () => {
+      // deposit first rewards
+      let wBTCOTotalRewardFirst = 30;
+
+      await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, wBTCOTotalRewardFirst);
+
+      // mock BTC/ETH reward signature
+      signatureAliceBTC = await getSignature(maintainer, alice.address, pidPBTCM, wBTCO.address, 10, claimIndex);
+
+      await polkamineAdmin.connect(manager).pause();
+      await expect(
+        polkamineRewardDistributor.connect(alice).claim(pidPBTCM, wBTCO.address, 10, claimIndex, signatureAliceBTC),
+      ).to.be.revertedWith("Paused");
+      await polkamineAdmin.connect(manager).unpause();
+    });
+
+    it("Should claim rewards by staker when unpaused", async () => {
       // deposit first rewards
       let wBTCOTotalRewardFirst = 30,
         wETHOTotalRewardFirst = 60;

@@ -31,7 +31,7 @@ main = async () => {
   console.log("RewardDepositor address = ", rewardDepositor.address);
   console.log("Maintainer address = ", maintainer.address);
 
-  // pToken
+  // depositToken
   const PToken = await hre.ethers.getContractFactory("PToken");
   const pBTCM = await upgrades.deployProxy(PToken, ["pBTCM", "pBTCM"]);
   await pBTCM.deployed();
@@ -41,7 +41,7 @@ main = async () => {
   await pETHM.deployed();
   console.log("pETHM token contract deployed to:", pETHM.address);
 
-  // wToken
+  // rewardToken
   const WToken = await hre.ethers.getContractFactory("WToken");
   const wBTCO = await upgrades.deployProxy(WToken, ["wBTCO", "wBTCO"]);
   await wBTCO.deployed();
@@ -74,11 +74,11 @@ main = async () => {
   // Deploy PolkaminePools and add them to PolkaminePoolManager.
   const PolkaminePool = await hre.ethers.getContractFactory("PolkaminePool");
 
-  const pBTCMPool = await upgrades.deployProxy(PolkaminePool, [pBTCM.address, wBTCO.address]);
+  const pBTCMPool = await upgrades.deployProxy(PolkaminePool, [polkamineAdmin.address, pBTCM.address, wBTCO.address]);
   await pBTCMPool.deployed();
   console.log("pBTCMPool contract deployed to:", pBTCMPool.address);
 
-  const pETHMPool = await upgrades.deployProxy(PolkaminePool, [pETHM.address, wETHO.address]);
+  const pETHMPool = await upgrades.deployProxy(PolkaminePool, [polkamineAdmin.address, pETHM.address, wETHO.address]);
   await pETHMPool.deployed();
   console.log("pETHMPool contract deployed to:", pETHMPool.address);
 
@@ -105,7 +105,7 @@ main = async () => {
   await polkamineRewardDistributor.connect(maintainer).setClaimIndex(claimIndex);
   await polkamineRewardDistributor.connect(manager).setClaimInterval(claimInterval);
 
-  // Grant roles to pToken, wToken and MINE Token
+  // Grant roles to depositToken, rewardToken and MINE Token
   await pBTCM.grantRole(MINTER_ROLE, deployer.address);
   await pETHM.grantRole(MINTER_ROLE, deployer.address);
   await wBTCO.grantRole(MINTER_ROLE, deployer.address);

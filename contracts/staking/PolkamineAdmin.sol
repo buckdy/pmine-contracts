@@ -2,29 +2,34 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-
-import "../interfaces/IPolkamineAdmin.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 /**
  * @title Polkamine's Admin contract
  * @author Polkamine
  */
-contract PolkamineAdmin is IPolkamineAdmin, OwnableUpgradeable {
+contract PolkamineAdmin is PausableUpgradeable, OwnableUpgradeable {
   /*** Storage Properties ***/
 
   // polkamine manager addresses
-  address public override manager;
-  address public override rewardDepositor;
-  address public override maintainer;
+  address public manager;
+  address public rewardDepositor;
+  address public maintainer;
 
   // polkamine contracts
-  address public override rewardDistributorContract;
-  address public override poolManagerContract;
+  address public rewardDistributorContract;
+  address public poolManagerContract;
 
   /*** Contract Logic Starts Here */
 
+  modifier onlyManager() {
+    require(msg.sender == manager, "Not polkamine manager");
+    _;
+  }
+
   function initialize(address _manager) public initializer {
     __Ownable_init();
+    __Pausable_init();
 
     manager = _manager;
   }
@@ -67,5 +72,19 @@ contract PolkamineAdmin is IPolkamineAdmin, OwnableUpgradeable {
    */
   function setMaintainer(address _maintainer) external onlyOwner {
     maintainer = _maintainer;
+  }
+
+  /**
+   * @notice Pause protocol
+   */
+  function pause() external onlyManager {
+    super._pause();
+  }
+
+  /**
+   * @notice Unpause protocol
+   */
+  function unpause() external onlyManager {
+    super._unpause();
   }
 }
