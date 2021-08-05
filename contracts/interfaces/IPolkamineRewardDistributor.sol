@@ -6,7 +6,7 @@ interface IPolkamineRewardDistributor {
 
   function claim(
     uint256 _pid,
-    address _wToken,
+    address _rewardToken,
     uint256 _amount,
     uint256 _claimIndex,
     bytes memory signature

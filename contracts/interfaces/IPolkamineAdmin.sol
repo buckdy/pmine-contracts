@@ -11,4 +11,6 @@ interface IPolkamineAdmin {
   function rewardDistributorContract() external view returns (address);
 
   function poolManagerContract() external view returns (address);
+
+  function paused() external view returns (bool);
 }

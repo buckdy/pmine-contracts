@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IPolkaminePoolManager.sol";
+import "../interfaces/IPolkaminePool.sol";
 import "../interfaces/IPolkamineAdmin.sol";
 
 /**
@@ -12,13 +13,14 @@ import "../interfaces/IPolkamineAdmin.sol";
  */
 contract PolkaminePoolManager is IPolkaminePoolManager, Initializable {
   /*** Events ***/
-  event AddPool(uint256 pid, address indexed pool);
+  event AddPool(uint256 pid, address indexed pool, address indexed depositToken, address indexed rewardToken);
   event RemovePool(uint256 pid, address indexed pool);
 
   /*** Constants ***/
 
   /*** Storage Properties ***/
   address public addressManager;
+  mapping(address => bool) public isDeprecatedPool;
   address[] public override pools;
   mapping(address => uint256) internal _poolIndex;
 
@@ -46,7 +48,7 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable {
     pools.push(_pool);
     _poolIndex[_pool] = pools.length;
 
-    emit AddPool(pid, _pool);
+    emit AddPool(pid, _pool, IPolkaminePool(_pool).depositToken(), IPolkaminePool(_pool).rewardToken());
   }
 
   /**
@@ -55,16 +57,11 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable {
    */
   function removePool(uint256 _pid) external override onlyManager returns (address pool) {
     require(_pid < pools.length, "Invalid pool index");
-    uint256 length = pools.length;
 
     pool = pools[_pid];
 
     // remove pool
-    _poolIndex[pools[length - 1]] = _pid + 1;
-    _poolIndex[pool] = 0;
-
-    pools[_pid] = pools[length - 1];
-    pools.pop();
+    isDeprecatedPool[pool] = true;
 
     emit RemovePool(_pid, pool);
   }

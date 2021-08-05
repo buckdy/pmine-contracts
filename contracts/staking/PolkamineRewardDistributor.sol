@@ -56,6 +56,11 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     _;
   }
 
+  modifier onlyUnpaused() {
+    require(!IPolkamineAdmin(addressManager).paused(), "Paused");
+    _;
+  }
+
   function initialize(address _addressManager, uint256 _claimInterval) public initializer {
     __ReentrancyGuard_init();
 
@@ -68,7 +73,7 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
    * @param _rewardToken reward token address
    * @param _amount reward token amount
    */
-  function deposit(address _rewardToken, uint256 _amount) external override onlyRewardDepositor {
+  function deposit(address _rewardToken, uint256 _amount) external override onlyRewardDepositor onlyUnpaused {
     require(IERC20Upgradeable(_rewardToken).transferFrom(msg.sender, address(this), _amount), "Transfer failure");
 
     emit Deposit(msg.sender, _rewardToken, _amount);
@@ -84,11 +89,11 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
    */
   function claim(
     uint256 _pid,
-    address _wToken,
+    address _rewardToken,
     uint256 _amount,
     uint256 _claimIndex,
     bytes memory _signature
-  ) external override nonReentrant {
+  ) external override nonReentrant onlyUnpaused {
     // check signature duplication
     require(!isUsedSignature[_signature], "Already used signature");
     isUsedSignature[_signature] = true;
@@ -102,17 +107,17 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
 
     // check signer
     address maintainer = IPolkamineAdmin(addressManager).maintainer();
-    bytes32 data = keccak256(abi.encodePacked(msg.sender, _pid, _wToken, _amount, _claimIndex));
+    bytes32 data = keccak256(abi.encodePacked(msg.sender, _pid, _rewardToken, _amount, _claimIndex));
     require(data.toEthSignedMessageHash().recover(_signature) == maintainer, "Invalid signer");
 
     // check pid
     address poolManager = IPolkamineAdmin(addressManager).poolManagerContract();
     require(_pid < IPolkaminePoolManager(poolManager).poolLength(), "Invalid pid");
 
-    // check wToken
+    // check rewardToken
     address pool = IPolkaminePoolManager(poolManager).pools(_pid);
-    address rewardToken = IPolkaminePool(pool).wToken();
-    require(rewardToken == _wToken, "Unmatched reward token");
+    address rewardToken = IPolkaminePool(pool).rewardToken();
+    require(rewardToken == _rewardToken, "Unmatched reward token");
 
     // transfer reward
     userClaimedReward[_pid][msg.sender] += _amount;
