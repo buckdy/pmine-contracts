@@ -52,19 +52,6 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "c__0x41314b2e",
-        "type": "bytes32"
-      }
-    ],
-    "name": "c_0x41314b2e",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_pToken",
         "type": "address"
