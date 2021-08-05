@@ -13,6 +13,18 @@
         "internalType": "address",
         "name": "pool",
         "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "depositToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "rewardToken",
+        "type": "address"
       }
     ],
     "name": "AddPool",
@@ -85,6 +97,19 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32",
+        "name": "c__0x9c1a2435",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x9c1a2435",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_addressManager",
         "type": "address"
@@ -93,6 +118,25 @@
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "isDeprecatedPool",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

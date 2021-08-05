@@ -50,15 +50,59 @@
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "addressManager",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "c__0x41314b2e",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x41314b2e",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "depositToken",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
-        "name": "_pToken",
+        "name": "_addressManager",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_wToken",
+        "name": "_depositToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_rewardToken",
         "type": "address"
       }
     ],
@@ -69,7 +113,7 @@
   },
   {
     "inputs": [],
-    "name": "pToken",
+    "name": "rewardToken",
     "outputs": [
       {
         "internalType": "address",
@@ -120,19 +164,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "wToken",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
