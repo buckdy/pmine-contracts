@@ -39,11 +39,6 @@ describe("Polkamine Pool Manage", () => {
     const PolkaminePoolManager = await ethers.getContractFactory("PolkaminePoolManager");
     polkaminePoolManager = await upgrades.deployProxy(PolkaminePoolManager, [polkamineAdmin.address]);
 
-    // Deploy PolkaminePools
-    const PolkaminePool = await ethers.getContractFactory("PolkaminePool");
-    pBTCMPool = await upgrades.deployProxy(PolkaminePool, [polkamineAdmin.address, pBTCM.address, wBTCO.address]);
-    pETHMPool = await upgrades.deployProxy(PolkaminePool, [polkamineAdmin.address, pETHM.address, wETHO.address]);
-
     // Deploy PolkamineRewardDistributor ans set the address to PolkamineAdmin
     rewardInterval = 43200; // half day
     const PolkamineRewardDistributor = await ethers.getContractFactory("PolkamineRewardDistributor");

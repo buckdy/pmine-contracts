@@ -53,15 +53,10 @@ describe("PolkamineRewardDistributor", () => {
     const PolkaminePoolManager = await ethers.getContractFactory("PolkaminePoolManager");
     polkaminePoolManager = await upgrades.deployProxy(PolkaminePoolManager, [polkamineAdmin.address]);
 
-    // Deploy PolkaminePools and add them to PolkaminePoolManager.
-    const PolkaminePool = await ethers.getContractFactory("PolkaminePool");
-    pBTCMPool = await upgrades.deployProxy(PolkaminePool, [polkamineAdmin.address, pBTCM.address, wBTCO.address]);
-    pETHMPool = await upgrades.deployProxy(PolkaminePool, [polkamineAdmin.address, pETHM.address, wETHO.address]);
-
-    await polkaminePoolManager.connect(manager).addPool(pBTCMPool.address);
+    await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTCO.address);
     pidPBTCM = 0;
 
-    await polkaminePoolManager.connect(manager).addPool(pETHMPool.address);
+    await polkaminePoolManager.connect(manager).addPool(pETHM.address, wETHO.address);
     pidPETHM = 1;
 
     // initialize claimIndex and claimInterval
@@ -141,6 +136,10 @@ describe("PolkamineRewardDistributor", () => {
     });
 
     it("Should deposit reward token when unpaused", async () => {
+      await expect(
+        polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, MINT_AMOUNT),
+      ).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
+
       expect(await wBTCO.balanceOf(rewardDepositor.address)).to.equal(MINT_AMOUNT);
       expect(await wBTCO.balanceOf(polkamineRewardDistributor.address)).to.equal(0);
       await wBTCO.connect(rewardDepositor).approve(polkamineRewardDistributor.address, MINT_AMOUNT);

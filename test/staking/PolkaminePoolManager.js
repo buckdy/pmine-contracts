@@ -39,11 +39,6 @@ describe("Polkamine Pool Manage", () => {
     const PolkaminePoolManager = await ethers.getContractFactory("PolkaminePoolManager");
     polkaminePoolManager = await upgrades.deployProxy(PolkaminePoolManager, [polkamineAdmin.address]);
 
-    // Deploy PolkaminePools
-    const PolkaminePool = await ethers.getContractFactory("PolkaminePool");
-    pBTCMPool = await upgrades.deployProxy(PolkaminePool, [polkamineAdmin.address, pBTCM.address, wBTCO.address]);
-    pETHMPool = await upgrades.deployProxy(PolkaminePool, [polkamineAdmin.address, pETHM.address, wETHO.address]);
-
     // Deploy PolkamineRewardDistributor ans set the address to PolkamineAdmin
     rewardInterval = 43200; // half day
     const PolkamineRewardDistributor = await ethers.getContractFactory("PolkamineRewardDistributor");
@@ -77,105 +72,78 @@ describe("Polkamine Pool Manage", () => {
     await wETHO.mint(rewardDepositor.address, MINT_AMOUNT);
   });
 
-  describe("PolkaminePool", () => {
-    it("Should initialize", async () => {
-      expect(await pBTCMPool.depositToken()).to.be.equal(pBTCM.address);
-      expect(await pBTCMPool.rewardToken()).to.be.equal(wBTCO.address);
-    });
-
-    it("Should not be able to stake when paused", async () => {
-      await polkamineAdmin.connect(manager).pause();
-      await expect(pBTCMPool.connect(alice).stake(MINT_AMOUNT + 1)).to.be.revertedWith("Paused");
-      await polkamineAdmin.connect(manager).unpause();
-    });
-
-    it("Should be able to stake when unpaused", async () => {
-      await expect(pBTCMPool.connect(alice).stake(10)).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
-
-      await pBTCM.connect(alice).approve(pBTCMPool.address, ethers.constants.MaxUint256);
-
-      await expect(pBTCMPool.connect(alice).stake(MINT_AMOUNT + 1)).to.be.revertedWith(
-        "ERC20: transfer amount exceeds balance",
-      );
-
-      expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT);
-      expect(await pBTCM.balanceOf(pBTCMPool.address)).to.be.equal(0);
-      await pBTCMPool.connect(alice).stake(10);
-      expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT - 10);
-      expect(await pBTCM.balanceOf(pBTCMPool.address)).to.be.equal(10);
-    });
-
-    it("Should not be able to unstake when paused", async () => {
-      await polkamineAdmin.connect(manager).pause();
-      await expect(pBTCMPool.connect(alice).unstake(MINT_AMOUNT + 1)).to.be.revertedWith("Paused");
-      await polkamineAdmin.connect(manager).unpause();
-    });
-
-    it("Should be able to unstake when unpaused", async () => {
-      await expect(pBTCMPool.connect(alice).unstake(11)).to.be.revertedWith("Invalid amount");
-
-      expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT - 10);
-      expect(await pBTCM.balanceOf(pBTCMPool.address)).to.be.equal(10);
-      await pBTCMPool.connect(alice).unstake(10);
-      expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT);
-      expect(await pBTCM.balanceOf(pBTCMPool.address)).to.be.equal(0);
-    });
-  });
-
   describe("PolkaminePoolManager", () => {
     it("Should initialize", async () => {
       expect(await polkaminePoolManager.addressManager()).to.be.equal(polkamineAdmin.address);
     });
 
     it("Should be able to add pool", async () => {
-      await expect(polkaminePoolManager.addPool(pBTCMPool.address)).to.be.revertedWith("Not polkamine manager");
+      await expect(polkaminePoolManager.addPool(pBTCM.address, wBTCO.address)).to.be.revertedWith(
+        "Not polkamine manager",
+      );
 
       await expect(polkaminePoolManager.pools(0)).to.be.reverted;
-      expect(await polkaminePoolManager.isPool(pBTCMPool.address)).to.be.false;
       expect(await polkaminePoolManager.poolLength()).to.be.equal(0);
-      await polkaminePoolManager.connect(manager).addPool(pBTCMPool.address);
-      expect(await polkaminePoolManager.pools(0)).to.be.equal(pBTCMPool.address);
-      expect(await polkaminePoolManager.isPool(pBTCMPool.address)).to.be.true;
+      await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTCO.address);
+      expect(await polkaminePoolManager.pools(0)).to.be.deep.equal([pBTCM.address, wBTCO.address]);
       expect(await polkaminePoolManager.poolLength()).to.be.equal(1);
-
-      await expect(polkaminePoolManager.connect(manager).addPool(pBTCMPool.address)).to.be.revertedWith(
-        "Pool already exists",
-      );
-    });
-
-    it("Should be able to get all pools", async () => {
-      let pools = await polkaminePoolManager.allPools();
-      expect(pools.length).to.be.equal(1);
-      expect(await polkaminePoolManager.poolLength()).to.be.equal(1);
-
-      await polkaminePoolManager.connect(manager).addPool(pETHMPool.address);
-
-      pools = await polkaminePoolManager.allPools();
-      expect(pools.length).to.be.equal(2);
-      expect(pools[0]).to.be.equal(pBTCMPool.address);
-      expect(pools[1]).to.be.equal(pETHMPool.address);
-      expect(await polkaminePoolManager.poolLength()).to.be.equal(2);
-    });
-
-    it("Should be able to get pool index", async () => {
-      await expect(polkaminePoolManager.poolIndex(deployer.address)).to.be.revertedWith("Invalid pool");
-
-      expect(await polkaminePoolManager.poolIndex(pBTCMPool.address)).to.be.equal(0);
-      expect(await polkaminePoolManager.poolIndex(pETHMPool.address)).to.be.equal(1);
     });
 
     it("Should be able to remove pool", async () => {
       await expect(polkaminePoolManager.removePool(0)).to.be.revertedWith("Not polkamine manager");
       await expect(polkaminePoolManager.connect(manager).removePool(10)).to.be.revertedWith("Invalid pool index");
 
-      let pool = await polkaminePoolManager.pools(0);
-      expect(await polkaminePoolManager.isDeprecatedPool(pool)).to.be.false;
+      expect(await polkaminePoolManager.isDeprecatedPool(0)).to.be.false;
       await polkaminePoolManager.connect(manager).removePool(0);
-      expect(await polkaminePoolManager.pools(0)).to.be.equal(pBTCMPool.address);
-      expect(await polkaminePoolManager.poolIndex(pool)).to.be.equal(0);
-      expect(await polkaminePoolManager.isPool(pBTCMPool.address)).to.be.true;
-      expect(await polkaminePoolManager.isDeprecatedPool(pool)).to.be.true;
-      expect(await polkaminePoolManager.poolLength()).to.be.equal(2);
+      expect(await polkaminePoolManager.pools(0)).to.be.deep.equal([pBTCM.address, wBTCO.address]);
+      expect(await polkaminePoolManager.isDeprecatedPool(0)).to.be.true;
+      expect(await polkaminePoolManager.poolLength()).to.be.equal(1);
+    });
+
+    it("Should not be able to stake when paused", async () => {
+      await polkamineAdmin.connect(manager).pause();
+      await expect(polkaminePoolManager.connect(alice).stake(0, MINT_AMOUNT + 1)).to.be.revertedWith("Paused");
+      await polkamineAdmin.connect(manager).unpause();
+    });
+
+    it("Should be able to stake when unpaused", async () => {
+      await expect(polkaminePoolManager.connect(alice).stake(1, 10)).to.be.revertedWith("Invalid pool index");
+      await expect(polkaminePoolManager.connect(alice).stake(0, 10)).to.be.revertedWith(
+        "ERC20: transfer amount exceeds allowance",
+      );
+
+      await pBTCM.connect(alice).approve(polkaminePoolManager.address, ethers.constants.MaxUint256);
+
+      await expect(polkaminePoolManager.connect(alice).stake(0, MINT_AMOUNT + 1)).to.be.revertedWith(
+        "ERC20: transfer amount exceeds balance",
+      );
+
+      expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT);
+      expect(await pBTCM.balanceOf(polkaminePoolManager.address)).to.be.equal(0);
+      expect(await polkaminePoolManager.userStakes(0, alice.address)).to.be.equal(0);
+      await polkaminePoolManager.connect(alice).stake(0, 10);
+      expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT - 10);
+      expect(await pBTCM.balanceOf(polkaminePoolManager.address)).to.be.equal(10);
+      expect(await polkaminePoolManager.userStakes(0, alice.address)).to.be.equal(10);
+    });
+
+    it("Should not be able to unstake when paused", async () => {
+      await polkamineAdmin.connect(manager).pause();
+      await expect(polkaminePoolManager.connect(alice).unstake(0, MINT_AMOUNT + 1)).to.be.revertedWith("Paused");
+      await polkamineAdmin.connect(manager).unpause();
+    });
+
+    it("Should be able to unstake when unpaused", async () => {
+      await expect(polkaminePoolManager.connect(alice).unstake(1, 10)).to.be.revertedWith("Invalid pool index");
+      await expect(polkaminePoolManager.connect(alice).unstake(0, 11)).to.be.revertedWith("Invalid amount");
+
+      expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT - 10);
+      expect(await pBTCM.balanceOf(polkaminePoolManager.address)).to.be.equal(10);
+      expect(await polkaminePoolManager.userStakes(0, alice.address)).to.be.equal(10);
+      await polkaminePoolManager.connect(alice).unstake(0, 10);
+      expect(await pBTCM.balanceOf(alice.address)).to.be.equal(MINT_AMOUNT);
+      expect(await pBTCM.balanceOf(polkaminePoolManager.address)).to.be.equal(0);
+      expect(await polkaminePoolManager.userStakes(0, alice.address)).to.be.equal(0);
     });
   });
 });

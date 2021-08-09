@@ -2,13 +2,11 @@
 pragma solidity ^0.8.0;
 
 interface IPolkaminePoolManager {
-  function addPool(address _pool) external returns (uint256);
+  function pools(uint256 pid) external returns (address depositToken, address rewardToken);
 
-  function removePool(uint256 _pid) external returns (address);
+  function addPool(address _depositToken, address _rewardToken) external returns (uint256);
 
-  function allPools() external view returns (address[] memory);
+  function removePool(uint256 _pid) external;
 
   function poolLength() external view returns (uint256);
-
-  function pools(uint256 _pid) external view returns (address);
 }

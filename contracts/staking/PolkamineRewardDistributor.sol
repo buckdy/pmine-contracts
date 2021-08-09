@@ -2,12 +2,12 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
 
 import "../interfaces/IPolkamineRewardDistributor.sol";
 import "../interfaces/IPolkaminePoolManager.sol";
-import "../interfaces/IPolkaminePool.sol";
 import "../interfaces/IPolkamineAdmin.sol";
 
 /**
@@ -17,6 +17,7 @@ import "../interfaces/IPolkamineAdmin.sol";
  */
 contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGuardUpgradeable {
   using ECDSAUpgradeable for bytes32;
+  using SafeERC20Upgradeable for IERC20Upgradeable;
 
   /*** Events ***/
   event Deposit(address indexed from, address indexed rewardToken, uint256 amount);
@@ -74,7 +75,7 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
    * @param _amount reward token amount
    */
   function deposit(address _rewardToken, uint256 _amount) external override onlyRewardDepositor onlyUnpaused {
-    require(IERC20Upgradeable(_rewardToken).transferFrom(msg.sender, address(this), _amount), "Transfer failure");
+    IERC20Upgradeable(_rewardToken).safeTransferFrom(msg.sender, address(this), _amount);
 
     emit Deposit(msg.sender, _rewardToken, _amount);
   }
@@ -115,8 +116,7 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
     require(_pid < IPolkaminePoolManager(poolManager).poolLength(), "Invalid pid");
 
     // check rewardToken
-    address pool = IPolkaminePoolManager(poolManager).pools(_pid);
-    address rewardToken = IPolkaminePool(pool).rewardToken();
+    (, address rewardToken) = IPolkaminePoolManager(poolManager).pools(_pid);
     require(rewardToken == _rewardToken, "Unmatched reward token");
 
     // transfer reward
