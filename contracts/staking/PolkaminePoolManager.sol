@@ -60,6 +60,7 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable, Reentranc
    */
   function addPool(address _depositToken, address _rewardToken) external override onlyManager returns (uint256 pid) {
     pools.push(PoolInfo(_depositToken, _rewardToken));
+    pid = pools.length - 1;
 
     emit AddPool(pid, _depositToken, _rewardToken);
   }
