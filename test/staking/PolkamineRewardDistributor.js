@@ -136,9 +136,9 @@ describe("PolkamineRewardDistributor", () => {
     });
 
     it("Should deposit reward token when unpaused", async () => {
-      await expect(polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, MINT_AMOUNT)).to.be.revertedWith(
-        "ERC20: transfer amount exceeds allowance",
-      );
+      await expect(
+        polkamineRewardDistributor.connect(rewardDepositor).deposit(wBTCO.address, MINT_AMOUNT),
+      ).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
 
       expect(await wBTCO.balanceOf(rewardDepositor.address)).to.equal(MINT_AMOUNT);
       expect(await wBTCO.balanceOf(polkamineRewardDistributor.address)).to.equal(0);

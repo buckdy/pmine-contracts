@@ -78,7 +78,9 @@ describe("Polkamine Pool Manage", () => {
     });
 
     it("Should be able to add pool", async () => {
-      await expect(polkaminePoolManager.addPool(pBTCM.address, wBTCO.address)).to.be.revertedWith("Not polkamine manager");
+      await expect(polkaminePoolManager.addPool(pBTCM.address, wBTCO.address)).to.be.revertedWith(
+        "Not polkamine manager",
+      );
 
       await expect(polkaminePoolManager.pools(0)).to.be.reverted;
       expect(await polkaminePoolManager.poolLength()).to.be.equal(0);
@@ -106,7 +108,9 @@ describe("Polkamine Pool Manage", () => {
 
     it("Should be able to stake when unpaused", async () => {
       await expect(polkaminePoolManager.connect(alice).stake(1, 10)).to.be.revertedWith("Invalid pool index");
-      await expect(polkaminePoolManager.connect(alice).stake(0, 10)).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
+      await expect(polkaminePoolManager.connect(alice).stake(0, 10)).to.be.revertedWith(
+        "ERC20: transfer amount exceeds allowance",
+      );
 
       await pBTCM.connect(alice).approve(polkaminePoolManager.address, ethers.constants.MaxUint256);
 
