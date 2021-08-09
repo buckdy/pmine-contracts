@@ -2,27 +2,38 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "../interfaces/IPolkaminePoolManager.sol";
-import "../interfaces/IPolkaminePool.sol";
 import "../interfaces/IPolkamineAdmin.sol";
 
 /**
  * @title Polkamine's Pool Manager contract
  * @author Polkamine
  */
-contract PolkaminePoolManager is IPolkaminePoolManager, Initializable {
+contract PolkaminePoolManager is IPolkaminePoolManager, Initializable, ReentrancyGuardUpgradeable {
+  using SafeERC20Upgradeable for IERC20Upgradeable;
+
   /*** Events ***/
-  event AddPool(uint256 pid, address indexed pool, address indexed depositToken, address indexed rewardToken);
-  event RemovePool(uint256 pid, address indexed pool);
+  event AddPool(uint256 pid, address indexed depositToken, address indexed rewardToken);
+  event RemovePool(uint256 pid);
+  event Stake(uint256 pid, address indexed user, uint256 amount, uint256 timestamp);
+  event Unstake(uint256 pid, address indexed user, uint256 amount, uint256 timestamp);
 
   /*** Constants ***/
 
   /*** Storage Properties ***/
+  struct PoolInfo {
+    address depositToken;
+    address rewardToken;
+  }
+
   address public addressManager;
-  mapping(address => bool) public isDeprecatedPool;
-  address[] public override pools;
-  mapping(address => uint256) internal _poolIndex;
+  PoolInfo[] public override pools;
+  mapping(uint256 => mapping(address => uint256)) public userStakes;
+  mapping(uint256 => bool) public isDeprecatedPool;
 
   /*** Contract Logic Starts Here */
 
@@ -31,46 +42,67 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable {
     _;
   }
 
+  modifier onlyUnpaused() {
+    require(!IPolkamineAdmin(addressManager).paused(), "Paused");
+    _;
+  }
+
   function initialize(address _addressManager) public initializer {
+    __ReentrancyGuard_init();
+
     addressManager = _addressManager;
   }
 
   /**
    * @notice Add a new pool
-   * @param _pool a new pool address to be added
+   * @param _depositToken the deposit token address
+   * @param _rewardToken the reward token address
    */
-  function addPool(address _pool) external override onlyManager returns (uint256 pid) {
-    require(_poolIndex[_pool] == 0, "Pool already exists");
+  function addPool(address _depositToken, address _rewardToken) external override onlyManager returns (uint256 pid) {
+    pools.push(PoolInfo(_depositToken, _rewardToken));
 
-    pid = pools.length;
-
-    // add pool
-    pools.push(_pool);
-    _poolIndex[_pool] = pools.length;
-
-    emit AddPool(pid, _pool, IPolkaminePool(_pool).depositToken(), IPolkaminePool(_pool).rewardToken());
+    emit AddPool(pid, _depositToken, _rewardToken);
   }
 
   /**
    * @notice Remove a pool
    * @param _pid the pool index to be removed
    */
-  function removePool(uint256 _pid) external override onlyManager returns (address pool) {
+  function removePool(uint256 _pid) external override onlyManager {
     require(_pid < pools.length, "Invalid pool index");
 
-    pool = pools[_pid];
-
     // remove pool
-    isDeprecatedPool[pool] = true;
+    isDeprecatedPool[_pid] = true;
 
-    emit RemovePool(_pid, pool);
+    emit RemovePool(_pid);
   }
 
   /**
-   * @notice Returns all pool addresses
+   * @notice stake depositToken
+   * @param _amount the stake amount
    */
-  function allPools() external view override returns (address[] memory) {
-    return pools;
+  function stake(uint256 _pid, uint256 _amount) external onlyUnpaused {
+    require(_pid < pools.length, "Invalid pool index");
+
+    IERC20Upgradeable(pools[_pid].depositToken).safeTransferFrom(msg.sender, address(this), _amount);
+
+    userStakes[_pid][msg.sender] += _amount;
+
+    emit Stake(_pid, msg.sender, _amount, block.timestamp);
+  }
+
+  /**
+   * @notice unstake depositToken
+   * @param _amount the unstake amount
+   */
+  function unstake(uint256 _pid, uint256 _amount) external nonReentrant onlyUnpaused {
+    require(_pid < pools.length, "Invalid pool index");
+    require(_amount <= userStakes[_pid][msg.sender], "Invalid amount");
+
+    userStakes[_pid][msg.sender] -= _amount;
+    IERC20Upgradeable(pools[_pid].depositToken).safeTransfer(msg.sender, _amount);
+
+    emit Unstake(_pid, msg.sender, _amount, block.timestamp);
   }
 
   /**
@@ -78,23 +110,5 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable {
    */
   function poolLength() external view override returns (uint256) {
     return pools.length;
-  }
-
-  /**
-   * @notice Returns if the given pool exists
-   * @param _pool the pool address
-   */
-  function isPool(address _pool) external view returns (bool) {
-    return _poolIndex[_pool] != 0;
-  }
-
-  /**
-   * @notice Returns index of the pool address
-   * @param _pool the pool address
-   */
-  function poolIndex(address _pool) external view returns (uint256) {
-    require(_poolIndex[_pool] != 0, "Invalid pool");
-
-    return _poolIndex[_pool] - 1;
   }
 }
