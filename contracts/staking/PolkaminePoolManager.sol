@@ -19,8 +19,8 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable, Reentranc
   /*** Events ***/
   event AddPool(uint256 pid, address indexed depositToken, address indexed rewardToken);
   event RemovePool(uint256 pid);
-  event Stake(uint256 pid, address indexed user, uint256 amount, uint256 timestamp);
-  event Unstake(uint256 pid, address indexed user, uint256 amount, uint256 timestamp);
+  event Stake(uint256 pid, address indexed user, uint256 amount);
+  event Unstake(uint256 pid, address indexed user, uint256 amount);
 
   /*** Constants ***/
 
@@ -89,7 +89,7 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable, Reentranc
 
     userStakes[_pid][msg.sender] += _amount;
 
-    emit Stake(_pid, msg.sender, _amount, block.timestamp);
+    emit Stake(_pid, msg.sender, _amount);
   }
 
   /**
@@ -103,7 +103,7 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable, Reentranc
     userStakes[_pid][msg.sender] -= _amount;
     IERC20Upgradeable(pools[_pid].depositToken).safeTransfer(msg.sender, _amount);
 
-    emit Unstake(_pid, msg.sender, _amount, block.timestamp);
+    emit Unstake(_pid, msg.sender, _amount);
   }
 
   /**
