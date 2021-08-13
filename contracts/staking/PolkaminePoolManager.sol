@@ -19,8 +19,7 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable, Reentranc
   /*** Events ***/
   event AddPool(uint256 pid, address indexed depositToken, address indexed rewardToken);
   event RemovePool(uint256 pid);
-  event Stake(uint256 pid, address indexed user, uint256 amount);
-  event Unstake(uint256 pid, address indexed user, uint256 amount);
+  event StakeChange(uint256 pid, address indexed user, uint256 fromAmount, uint256 toAmount);
 
   /*** Constants ***/
 
@@ -33,6 +32,7 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable, Reentranc
   address public addressManager;
   PoolInfo[] public override pools;
   mapping(uint256 => mapping(address => uint256)) public userStakes;
+  mapping(uint256 => uint256) public poolStakes;
   mapping(uint256 => bool) public isDeprecatedPool;
 
   /*** Contract Logic Starts Here */
@@ -84,12 +84,15 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable, Reentranc
    */
   function stake(uint256 _pid, uint256 _amount) external onlyUnpaused {
     require(_pid < pools.length, "Invalid pool index");
+    require(_amount > 0, "Invalid amount");
 
     IERC20Upgradeable(pools[_pid].depositToken).safeTransferFrom(msg.sender, address(this), _amount);
 
-    userStakes[_pid][msg.sender] += _amount;
+    uint256 fromAmount = userStakes[_pid][msg.sender];
+    userStakes[_pid][msg.sender] = fromAmount + _amount;
+    poolStakes[_pid] += _amount;
 
-    emit Stake(_pid, msg.sender, _amount);
+    emit StakeChange(_pid, msg.sender, fromAmount, userStakes[_pid][msg.sender]);
   }
 
   /**
@@ -98,12 +101,14 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable, Reentranc
    */
   function unstake(uint256 _pid, uint256 _amount) external nonReentrant onlyUnpaused {
     require(_pid < pools.length, "Invalid pool index");
-    require(_amount <= userStakes[_pid][msg.sender], "Invalid amount");
+    require(_amount > 0 && _amount <= userStakes[_pid][msg.sender], "Invalid amount");
 
-    userStakes[_pid][msg.sender] -= _amount;
+    uint256 fromAmount = userStakes[_pid][msg.sender];
+    userStakes[_pid][msg.sender] = fromAmount - _amount;
+    poolStakes[_pid] -= _amount;
     IERC20Upgradeable(pools[_pid].depositToken).safeTransfer(msg.sender, _amount);
 
-    emit Unstake(_pid, msg.sender, _amount);
+    emit StakeChange(_pid, msg.sender, fromAmount, userStakes[_pid][msg.sender]);
   }
 
   /**
