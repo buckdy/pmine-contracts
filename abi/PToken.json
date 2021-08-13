@@ -303,11 +303,11 @@
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "c__0x2d796a97",
+        "name": "c__0x247f73d6",
         "type": "bytes32"
       }
     ],
-    "name": "c_0x2d796a97",
+    "name": "c_0x247f73d6",
     "outputs": [],
     "stateMutability": "pure",
     "type": "function"

@@ -78,13 +78,13 @@ contract PolkamineAdmin is PausableUpgradeable, OwnableUpgradeable {
    * @notice Pause protocol
    */
   function pause() external onlyManager {
-    super._pause();
+    _pause();
   }
 
   /**
    * @notice Unpause protocol
    */
   function unpause() external onlyManager {
-    super._unpause();
+    _unpause();
   }
 }
