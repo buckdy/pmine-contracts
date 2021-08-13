@@ -55,36 +55,17 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount",
+        "name": "fromAmount",
         "type": "uint256"
-      }
-    ],
-    "name": "Stake",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "pid",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount",
+        "name": "toAmount",
         "type": "uint256"
       }
     ],
-    "name": "Unstake",
+    "name": "StakeChange",
     "type": "event"
   },
   {
@@ -172,6 +153,25 @@
   {
     "inputs": [],
     "name": "poolLength",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "poolStakes",
     "outputs": [
       {
         "internalType": "uint256",
