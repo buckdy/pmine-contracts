@@ -100,13 +100,11 @@ main = async () => {
   await wBTCO.grantRole(MINTER_ROLE, deployer.address);
   await wETHO.grantRole(MINTER_ROLE, deployer.address);
   await mine.grantRole(MINTER_ROLE, deployer.address);
-  await mine.grantRole(MINTER_ROLE, deployer.address);
 
   await pBTCM.grantRole(BURNER_ROLE, deployer.address);
   await pETHM.grantRole(BURNER_ROLE, deployer.address);
   await wBTCO.grantRole(BURNER_ROLE, deployer.address);
   await wETHO.grantRole(BURNER_ROLE, deployer.address);
-  await mine.grantRole(BURNER_ROLE, deployer.address);
   await mine.grantRole(BURNER_ROLE, deployer.address);
 };
 
