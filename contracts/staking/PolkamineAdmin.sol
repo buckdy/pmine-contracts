@@ -15,6 +15,7 @@ contract PolkamineAdmin is PausableUpgradeable, OwnableUpgradeable {
   address public manager;
   address public rewardDepositor;
   address public maintainer;
+  address public treasury;
 
   // polkamine contracts
   address public rewardDistributorContract;
@@ -72,6 +73,14 @@ contract PolkamineAdmin is PausableUpgradeable, OwnableUpgradeable {
    */
   function setMaintainer(address _maintainer) external onlyOwner {
     maintainer = _maintainer;
+  }
+
+  /**
+   * @notice set treasury address
+   * @param _treasury treasury address
+   */
+  function setTreasury(address _treasury) external onlyOwner {
+    treasury = _treasury;
   }
 
   /**
