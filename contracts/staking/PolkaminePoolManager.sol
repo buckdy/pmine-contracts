@@ -26,6 +26,7 @@ contract PolkaminePoolManager is IPolkaminePoolManager, ReentrancyGuardUpgradeab
   struct PoolInfo {
     address depositToken;
     address rewardToken;
+    address doubleRewardToken;
   }
 
   address public addressManager;
@@ -54,11 +55,12 @@ contract PolkaminePoolManager is IPolkaminePoolManager, ReentrancyGuardUpgradeab
 
   /**
    * @notice Add a new pool
-   * @param _depositToken the deposit token address
-   * @param _rewardToken the reward token address
+   * @param _depositToken deposit token address
+   * @param _rewardToken reward token address
+   * @param _doubleRewardToken double reward token address
    */
-  function addPool(address _depositToken, address _rewardToken) external override onlyManager returns (uint256 pid) {
-    pools.push(PoolInfo(_depositToken, _rewardToken));
+  function addPool(address _depositToken, address _rewardToken, address _doubleRewardToken) external override onlyManager returns (uint256 pid) {
+    pools.push(PoolInfo(_depositToken, _rewardToken, _doubleRewardToken));
     pid = pools.length - 1;
 
     emit AddPool(pid, _depositToken, _rewardToken);
