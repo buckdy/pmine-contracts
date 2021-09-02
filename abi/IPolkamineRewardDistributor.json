@@ -17,6 +17,16 @@
         "type": "uint256"
       },
       {
+        "internalType": "address",
+        "name": "_doubleRewardToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_doubleRewardAmount",
+        "type": "uint256"
+      },
+      {
         "internalType": "uint256",
         "name": "_claimIndex",
         "type": "uint256"
@@ -54,25 +64,6 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_pid",
-        "type": "uint256"
-      }
-    ],
-    "name": "poolClaimedReward",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
         "name": "_claimIndex",
         "type": "uint256"
       }
@@ -93,30 +84,6 @@
     "name": "setClaimInterval",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_pid",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_beneficiary",
-        "type": "address"
-      }
-    ],
-    "name": "userClaimedReward",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   }
 ]

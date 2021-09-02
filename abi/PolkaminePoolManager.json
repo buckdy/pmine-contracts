@@ -79,6 +79,11 @@
         "internalType": "address",
         "name": "_rewardToken",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_doubleRewardToken",
+        "type": "address"
       }
     ],
     "name": "addPool",
@@ -103,19 +108,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "c__0x9c1a2435",
-        "type": "bytes32"
-      }
-    ],
-    "name": "c_0x9c1a2435",
-    "outputs": [],
-    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -200,6 +192,11 @@
       {
         "internalType": "address",
         "name": "rewardToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "doubleRewardToken",
         "type": "address"
       }
     ],

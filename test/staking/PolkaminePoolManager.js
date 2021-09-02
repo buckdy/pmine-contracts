@@ -7,6 +7,7 @@ describe("Polkamine Pool Manage", () => {
     pETHM,
     wBTCO,
     wETHO,
+    mine,
     pBTCMPool,
     pETHMPool,
     PolkamineAdmin,
@@ -30,6 +31,10 @@ describe("Polkamine Pool Manage", () => {
     const WToken = await ethers.getContractFactory("WToken");
     wBTCO = await upgrades.deployProxy(WToken, ["wBTCO", "wBTCO"]);
     wETHO = await upgrades.deployProxy(WToken, ["wETHO", "wETHO"]);
+
+    // Deploy MINE Token
+    const MINEToken = await ethers.getContractFactory("MINEToken");
+    mine = await upgrades.deployProxy(MINEToken, ["MINE", "MINE"]);
 
     // Deploy PolkamineAdmin
     const PolkamineAdmin = await ethers.getContractFactory("PolkamineAdmin");
@@ -78,14 +83,14 @@ describe("Polkamine Pool Manage", () => {
     });
 
     it("Should be able to add pool", async () => {
-      await expect(polkaminePoolManager.addPool(pBTCM.address, wBTCO.address)).to.be.revertedWith(
+      await expect(polkaminePoolManager.addPool(pBTCM.address, wBTCO.address, mine.address)).to.be.revertedWith(
         "Not polkamine manager",
       );
 
       await expect(polkaminePoolManager.pools(0)).to.be.reverted;
       expect(await polkaminePoolManager.poolLength()).to.be.equal(0);
-      await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTCO.address);
-      expect(await polkaminePoolManager.pools(0)).to.be.deep.equal([pBTCM.address, wBTCO.address]);
+      await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTCO.address, mine.address);
+      expect(await polkaminePoolManager.pools(0)).to.be.deep.equal([pBTCM.address, wBTCO.address, mine.address]);
       expect(await polkaminePoolManager.poolLength()).to.be.equal(1);
     });
 
@@ -95,7 +100,7 @@ describe("Polkamine Pool Manage", () => {
 
       expect(await polkaminePoolManager.isDeprecatedPool(0)).to.be.false;
       await polkaminePoolManager.connect(manager).removePool(0);
-      expect(await polkaminePoolManager.pools(0)).to.be.deep.equal([pBTCM.address, wBTCO.address]);
+      expect(await polkaminePoolManager.pools(0)).to.be.deep.equal([pBTCM.address, wBTCO.address, mine.address]);
       expect(await polkaminePoolManager.isDeprecatedPool(0)).to.be.true;
       expect(await polkaminePoolManager.poolLength()).to.be.equal(1);
     });

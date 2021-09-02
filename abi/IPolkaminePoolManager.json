@@ -10,6 +10,11 @@
         "internalType": "address",
         "name": "_rewardToken",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_doubleRewradToken",
+        "type": "address"
       }
     ],
     "name": "addPool",
@@ -54,6 +59,11 @@
       {
         "internalType": "address",
         "name": "rewardToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "doubleRewardToken",
         "type": "address"
       }
     ],

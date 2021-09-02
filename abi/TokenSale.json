@@ -5,47 +5,23 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "beneficiary",
+        "name": "_purchaseTokenAddress",
         "type": "address"
       },
       {
         "indexed": true,
-        "internalType": "uint256",
-        "name": "pid",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
         "internalType": "address",
-        "name": "rewardToken",
+        "name": "_depositTokenAddress",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "doubleRewardToken",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "doubleRewardAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "_claimIndex",
+        "name": "_depositTokenAmount",
         "type": "uint256"
       }
     ],
-    "name": "Claim",
+    "name": "SetTokenPrice",
     "type": "event"
   },
   {
@@ -54,23 +30,36 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "rewardToken",
+        "name": "tokenAddress",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount",
+        "name": "tokenSupplyAmount",
         "type": "uint256"
       }
     ],
-    "name": "Deposit",
+    "name": "SetTokenSupplyAmount",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_tokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "withdrawAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "WithdrawFund",
     "type": "event"
   },
   {
@@ -89,88 +78,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_pid",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_rewardToken",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_doubleRewardToken",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_doubleRewardAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_claimIndex",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes",
-        "name": "_signature",
-        "type": "bytes"
-      }
-    ],
-    "name": "claim",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "claimInterval",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_rewardToken",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "deposit",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_addressManager",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_claimInterval",
-        "type": "uint256"
       }
     ],
     "name": "initialize",
@@ -181,12 +91,17 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_purchaseTokenAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_claimIndex",
+        "name": "_purchaseTokenAmount",
         "type": "uint256"
       }
     ],
-    "name": "setClaimIndex",
+    "name": "purchase",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -194,12 +109,40 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_purchaseTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_depositTokenAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_claimInterval",
+        "name": "_depositTokenAmount",
         "type": "uint256"
       }
     ],
-    "name": "setClaimInterval",
+    "name": "setTokenPrice",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_tokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_tokenSupplyAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "setTokenSupplyAmount",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -210,14 +153,33 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "name": "tokenPrice",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "depositTokenAddress",
+        "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "depositTokenAmount",
         "type": "uint256"
       }
     ],
-    "name": "userLastClaimedAt",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "tokenSupplyAmount",
     "outputs": [
       {
         "internalType": "uint256",
@@ -226,6 +188,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_tokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "withdrawFund",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]
