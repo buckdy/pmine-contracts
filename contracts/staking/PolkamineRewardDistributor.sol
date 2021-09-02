@@ -34,11 +34,6 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
   /*** Constants ***/
 
   /*** Storage Properties ***/
-  struct claimedRewardInfo {
-    address rewardToken;
-
-  }
-
   address public addressManager;
   mapping(address => mapping(uint256 => uint256)) public userLastClaimedAt;
   uint256 public claimInterval;
@@ -117,7 +112,9 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
 
     // check signer
     address maintainer = IPolkamineAdmin(addressManager).maintainer();
-    bytes32 data = keccak256(abi.encodePacked(msg.sender, _pid, _rewardToken, _amount, _doubleRewardToken, _doubleRewardAmount,  _claimIndex));
+    bytes32 data = keccak256(
+      abi.encodePacked(msg.sender, _pid, _rewardToken, _amount, _doubleRewardToken, _doubleRewardAmount, _claimIndex)
+    );
     require(data.toEthSignedMessageHash().recover(_signature) == maintainer, "Invalid signer");
 
     // check pid

@@ -59,7 +59,11 @@ contract PolkaminePoolManager is IPolkaminePoolManager, ReentrancyGuardUpgradeab
    * @param _rewardToken reward token address
    * @param _doubleRewardToken double reward token address
    */
-  function addPool(address _depositToken, address _rewardToken, address _doubleRewardToken) external override onlyManager returns (uint256 pid) {
+  function addPool(
+    address _depositToken,
+    address _rewardToken,
+    address _doubleRewardToken
+  ) external override onlyManager returns (uint256 pid) {
     pools.push(PoolInfo(_depositToken, _rewardToken, _doubleRewardToken));
     pid = pools.length - 1;
 
