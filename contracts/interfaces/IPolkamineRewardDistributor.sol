@@ -8,13 +8,11 @@ interface IPolkamineRewardDistributor {
     uint256 _pid,
     address _rewardToken,
     uint256 _amount,
+    address _doubleRewardToken,
+    uint256 _doubleRewardAmount,
     uint256 _claimIndex,
     bytes memory signature
   ) external;
-
-  function userClaimedReward(uint256 _pid, address _beneficiary) external view returns (uint256);
-
-  function poolClaimedReward(uint256 _pid) external view returns (uint256);
 
   function setClaimInterval(uint256 _claimInterval) external;
 

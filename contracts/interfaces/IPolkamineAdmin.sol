@@ -12,5 +12,7 @@ interface IPolkamineAdmin {
 
   function poolManagerContract() external view returns (address);
 
+  function treasury() external view returns (address);
+
   function paused() external view returns (bool);
 }

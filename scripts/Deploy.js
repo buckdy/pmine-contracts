@@ -71,8 +71,8 @@ main = async () => {
   await polkaminePoolManager.deployed();
   console.log("PolkaminePoolManager contract deployed to:", polkaminePoolManager.address);
 
-  await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTCO.address);
-  await polkaminePoolManager.connect(manager).addPool(pETHM.address, wETHO.address);
+  await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTCO.address, mine.address);
+  await polkaminePoolManager.connect(manager).addPool(pETHM.address, wETHO.address, mine.address);
 
   // Deploy PolkamineRewardDistributor ans set the address to PolkamineAdmin
   const PolkamineRewardDistributor = await ethers.getContractFactory("PolkamineRewardDistributor");

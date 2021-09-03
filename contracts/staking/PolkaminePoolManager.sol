@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
@@ -13,7 +12,7 @@ import "../interfaces/IPolkamineAdmin.sol";
  * @title Polkamine's Pool Manager contract
  * @author Polkamine
  */
-contract PolkaminePoolManager is IPolkaminePoolManager, Initializable, ReentrancyGuardUpgradeable {
+contract PolkaminePoolManager is IPolkaminePoolManager, ReentrancyGuardUpgradeable {
   using SafeERC20Upgradeable for IERC20Upgradeable;
 
   /*** Events ***/
@@ -27,6 +26,7 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable, Reentranc
   struct PoolInfo {
     address depositToken;
     address rewardToken;
+    address doubleRewardToken;
   }
 
   address public addressManager;
@@ -55,11 +55,16 @@ contract PolkaminePoolManager is IPolkaminePoolManager, Initializable, Reentranc
 
   /**
    * @notice Add a new pool
-   * @param _depositToken the deposit token address
-   * @param _rewardToken the reward token address
+   * @param _depositToken deposit token address
+   * @param _rewardToken reward token address
+   * @param _doubleRewardToken double reward token address
    */
-  function addPool(address _depositToken, address _rewardToken) external override onlyManager returns (uint256 pid) {
-    pools.push(PoolInfo(_depositToken, _rewardToken));
+  function addPool(
+    address _depositToken,
+    address _rewardToken,
+    address _doubleRewardToken
+  ) external override onlyManager returns (uint256 pid) {
+    pools.push(PoolInfo(_depositToken, _rewardToken, _doubleRewardToken));
     pid = pools.length - 1;
 
     emit AddPool(pid, _depositToken, _rewardToken);
