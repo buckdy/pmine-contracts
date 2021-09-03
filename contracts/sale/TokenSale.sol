@@ -22,6 +22,7 @@ contract TokenSale is ReentrancyGuardUpgradeable {
     uint256 _depositTokenAmount
   );
   event SetTokenSupplyAmount(address indexed tokenAddress, uint256 tokenSupplyAmount);
+	event Purchase(address depositTokenAddress, uint256 depositTokenAmount, address indexed purchaseTokenAddress, uint256 purchaseTokenAmount);
   event WithdrawFund(address indexed _tokenAddress, uint256 withdrawAmount);
 
   /*** Storage Properties ***/
@@ -81,6 +82,8 @@ contract TokenSale is ReentrancyGuardUpgradeable {
       depositTokenAmount * _purchaseTokenAmount
     );
     IPToken(_purchaseTokenAddress).mint(msg.sender, _purchaseTokenAmount);
+
+		emit Purchase(depositTokenAddress, depositTokenAmount,  _purchaseTokenAddress, _purchaseTokenAmount);
   }
 
   /**
