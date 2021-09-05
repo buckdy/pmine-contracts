@@ -22,7 +22,12 @@ contract TokenSale is ReentrancyGuardUpgradeable {
     uint256 _depositTokenAmount
   );
   event SetTokenSupplyAmount(address indexed tokenAddress, uint256 tokenSupplyAmount);
-	event Purchase(address depositTokenAddress, uint256 depositTokenAmount, address indexed purchaseTokenAddress, uint256 purchaseTokenAmount);
+  event Purchase(
+    address indexed depositTokenAddress,
+    uint256 depositTokenAmount,
+    address indexed purchaseTokenAddress,
+    uint256 purchaseTokenAmount
+  );
   event WithdrawFund(address indexed _tokenAddress, uint256 withdrawAmount);
 
   /*** Storage Properties ***/
@@ -39,6 +44,11 @@ contract TokenSale is ReentrancyGuardUpgradeable {
 
   modifier onlyManager() {
     require(msg.sender == IPolkamineAdmin(addressManager).manager(), "Not polkamine manager");
+    _;
+  }
+
+	modifier onlyOwner() {
+    require(msg.sender == IPolkamineAdmin(addressManager).owner(), "Not polkamine owner");
     _;
   }
 
@@ -83,7 +93,7 @@ contract TokenSale is ReentrancyGuardUpgradeable {
     );
     IPToken(_purchaseTokenAddress).mint(msg.sender, _purchaseTokenAmount);
 
-		emit Purchase(depositTokenAddress, depositTokenAmount,  _purchaseTokenAddress, _purchaseTokenAmount);
+    emit Purchase(depositTokenAddress, depositTokenAmount, _purchaseTokenAddress, _purchaseTokenAmount);
   }
 
   /**
@@ -101,7 +111,7 @@ contract TokenSale is ReentrancyGuardUpgradeable {
    * @notice Withdraw fund
    * @param _tokenAddress token address to withdraw
    */
-  function withdrawFund(address _tokenAddress) external onlyManager {
+  function withdrawFund(address _tokenAddress) external onlyOwner {
     address treasury = IPolkamineAdmin(addressManager).treasury();
     uint256 balance = IERC20Upgradeable(_tokenAddress).balanceOf(address(this));
 
