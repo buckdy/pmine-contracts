@@ -7,19 +7,19 @@
 
 #### Create .env file and make sure it's having following information:
 ```
-INFURA_KEY = Your Infura Key
-MNEMONIC = Your MNEMONIC
+INFURA_KEY = INFURA_KEY
+MNEMONIC = YOUR_MNEMONIC
 ```
 
 #### Create developmentConfig.json file in deployments folder and make sure it's having following information:
 ```
 {
     network: {
-        "ownerAddress": Owner_Address
-        "managerAddress": Manager_Address,
-        "treasuryAddress": Treasury_Address,
-        "rewardDepositorAddress": Reward_Depositor_Address,
-        "maintainerAddress": Maintainer_Address
+        "ownerAddress": OWNER_ADDRESS
+        "managerAddress": MANAGER_ADDRESS
+        "treasuryAddress": TREASURY_ADDRESS,
+        "rewardDepositorAddress": REWARD_DEPOSITOR_ADDRESS,
+        "maintainerAddress": MAINTAINER_ADDRESS
     }
 }
 ```
