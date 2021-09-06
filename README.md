@@ -1,17 +1,17 @@
-# MINE Network Smart Contracts
+## MINE Network Smart Contracts
 
-## Developer instructions
+### Developer instructions
 
-### Install dependencies
+#### Install dependencies
 `yarn install`
 
-### Create .env file and make sure it's having following information:
+#### Create .env file and make sure it's having following information:
 ```
 INFURA_KEY = Your Infura Key
 MNEMONIC = Your MNEMONIC
 ```
 
-### Create developmentConfig.json file in deployments folder and make sure it's having following information:
+#### Create developmentConfig.json file in deployments folder and make sure it's having following information:
 ```
 {
     network: {
@@ -24,16 +24,16 @@ MNEMONIC = Your MNEMONIC
 }
 ```
 
-### Compile code
+#### Compile code
 - `npx hardhat clean` (Clears the cache and deletes all artifacts)
 - `npx hardhat compile` (Compiles the entire project, building all artifacts)
 
-### Deploy code 
+#### Deploy code 
 - `npx hardhat node` (Starts a JSON-RPC server on top of Hardhat Network)
 - `npx hardhat run --network {network} scripts/{desired_deployment_script}`
 
-### Flatten contracts
+#### Flatten contracts
 - `npx hardhat flatten` (Flattens and prints contracts and their dependencies)
 
-### Deployed addresses and bytecodes
+#### Deployed addresses and bytecodes
 All deployed addresses and bytecodes can be found inside `deployments/contract-addresses.json` and `deployments/contract-abis.json` files.
