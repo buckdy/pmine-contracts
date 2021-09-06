@@ -18,7 +18,7 @@ const usdc = (amount) => {
 
 const bigNumber = (amount) => {
   return BigNumber.from(amount);
-}
+};
 
 module.exports = {
   ether,

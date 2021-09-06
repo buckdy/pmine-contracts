@@ -47,7 +47,7 @@ contract TokenSale is ReentrancyGuardUpgradeable {
     _;
   }
 
-	modifier onlyOwner() {
+  modifier onlyOwner() {
     require(msg.sender == IPolkamineAdmin(addressManager).owner(), "Not polkamine owner");
     _;
   }

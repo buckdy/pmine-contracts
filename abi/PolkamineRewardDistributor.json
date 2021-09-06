@@ -89,6 +89,19 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32",
+        "name": "c__0xfda1b3d0",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0xfda1b3d0",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "_pid",
         "type": "uint256"
