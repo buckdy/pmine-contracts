@@ -16,8 +16,13 @@ const usdc = (amount) => {
   return BigNumber.from(weiString);
 };
 
+const bigNumber = (amount) => {
+  return BigNumber.from(amount);
+};
+
 module.exports = {
   ether,
   gWei,
   usdc,
+  bigNumber,
 };

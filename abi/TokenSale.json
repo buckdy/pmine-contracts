@@ -5,6 +5,37 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "depositTokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "depositTokenAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "purchaseTokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "purchaseTokenAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Purchase",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "_purchaseTokenAddress",
         "type": "address"
       },
@@ -73,6 +104,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "c__0x91e40a05",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x91e40a05",
+    "outputs": [],
+    "stateMutability": "pure",
     "type": "function"
   },
   {

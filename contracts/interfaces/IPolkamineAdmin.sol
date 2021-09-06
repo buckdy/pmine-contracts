@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 interface IPolkamineAdmin {
   function manager() external view returns (address);
 
+  function owner() external view returns (address);
+
   function rewardDepositor() external view returns (address);
 
   function maintainer() external view returns (address);
