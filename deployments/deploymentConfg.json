@@ -1,0 +1,32 @@
+{
+    "mainnet": {
+        "ownerAddress": "0x29958CbFbE4c73bF3f97fa40cdC9C75290E382db",
+        "managerAddress": "0x29958CbFbE4c73bF3f97fa40cdC9C75290E382db",
+        "treasuryAddress": "0x29958CbFbE4c73bF3f97fa40cdC9C75290E382db",
+        "rewardDepositorAddress": "0x29958CbFbE4c73bF3f97fa40cdC9C75290E382db",
+        "maintainerAddress": "0x29958CbFbE4c73bF3f97fa40cdC9C75290E382db",
+        "claimInterval": 86400,
+        "wBTC": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "wETH": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "USDT": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pBTCMSupply": 100000000,
+        "pETHMSupply": 100000000,
+        "pBTCMPrice": 160,
+        "pETHMPrice": 140
+    },
+    "rinkeby": {
+        "ownerAddress": "0x29958CbFbE4c73bF3f97fa40cdC9C75290E382db",
+        "managerAddress": "0x29958CbFbE4c73bF3f97fa40cdC9C75290E382db",
+        "treasuryAddress": "0x29958CbFbE4c73bF3f97fa40cdC9C75290E382db",
+        "rewardDepositorAddress": "0x29958CbFbE4c73bF3f97fa40cdC9C75290E382db",
+        "maintainerAddress": "0x29958CbFbE4c73bF3f97fa40cdC9C75290E382db",
+        "claimInterval": 86400,
+        "wBTC": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "wETH": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "USDT": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pBTCMSupply": 100000000,
+        "pETHMSupply": 100000000,
+        "pBTCMPrice": 160,
+        "pETHMPrice": 140
+    }
+}
