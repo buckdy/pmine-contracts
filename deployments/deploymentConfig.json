@@ -1,0 +1,50 @@
+{
+    "mainnet": {
+        "ownerAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "managerAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "treasuryAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "rewardDepositorAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "maintainerAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "claimInterval": 86400,
+        "claimIndex": 0,
+        "wBTC": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "wETH": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "USDT": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pBTCMSupply": 100000000,
+        "pETHMSupply": 100000000,
+        "pBTCMPrice": 160,
+        "pETHMPrice": 140
+    },
+    "ropsten": {
+        "ownerAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "managerAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "treasuryAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "rewardDepositorAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "maintainerAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "claimInterval": 86400,
+        "claimIndex": 0,
+        "wBTC": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "wETH": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "USDT": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "pBTCMSupply": 100000000,
+        "pETHMSupply": 100000000,
+        "pBTCMPrice": 160,
+        "pETHMPrice": 140
+    },
+    "hardhat": {
+        "ownerAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "managerAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "treasuryAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "rewardDepositorAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "maintainerAddress": "0x94Fddc964DAe1b9a107BF198ea7130E259Bb77BF",
+        "claimInterval": 86400,
+        "claimIndex": 0,
+        "wBTC": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+        "wETH": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+        "USDT": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "pBTCMSupply": 100000000,
+        "pETHMSupply": 100000000,
+        "pBTCMPrice": 160,
+        "pETHMPrice": 140
+    }
+}

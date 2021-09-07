@@ -1,7 +1,7 @@
-const { ethers } = require("ethers");
 const hre = require("hardhat");
-const { getSavedContractAddresses, saveContractAddress, saveContractAbis } = require('./utils');
-let c = require('../deployments/deploymentConfig.json');
+const { ethers, upgrades } = require("hardhat");
+const { getSavedContractAddresses, saveContractAddress, saveContractAbis } = require('../utils');
+let c = require('../../deployments/deploymentConfig.json');
 
 main = async () => {
   // Configs
