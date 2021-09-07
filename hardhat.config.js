@@ -6,6 +6,7 @@ require("@openzeppelin/hardhat-upgrades");
 require("hardhat-gas-reporter");
 require("hardhat-abi-exporter");
 require("solidity-coverage");
+require("@nomiclabs/hardhat-etherscan");
 require('dotenv').config();
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -32,11 +33,11 @@ function nodeUrl(network) {
   return `https://${network}.infura.io/v3/${infuraKey}`;
 }
 
-let mnemonic = process.env.MNEMONIC || "";
-const accounts = mnemonic
-  ? {
-      mnemonic,
-    }
+let privateKey = process.env.PK || "";
+const accounts = privateKey
+  ? [
+    privateKey,
+    ]
   : undefined;
 
 module.exports = {
@@ -54,6 +55,9 @@ module.exports = {
           runs: 200,
         }
       },
+    },
+    local: {
+      url: 'http://localhost:8545',
     },
     kovan: {
       accounts,
@@ -118,4 +122,7 @@ module.exports = {
     flat: true,
     spacing: 2,
   },
+  etherscan: {
+    apiKey: process.env.API_KEY
+  }
 };
