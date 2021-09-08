@@ -5,6 +5,7 @@ const { getSavedContractAddresses, saveContractAddress, saveContractAbis } = req
 main = async () => {
   // Addresses
   [deployer] = await ethers.getSigners();
+  console.log('deployer address = ', deployer.address);
 
   // Deploy Mock USDT Token
   const USDTToken = await hre.ethers.getContractFactory("ERC20Mock");
