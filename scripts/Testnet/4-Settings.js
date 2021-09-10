@@ -1,6 +1,6 @@
 const hre = require("hardhat");
 const { ethers, upgrades, network } = require("hardhat");
-const { toRole } = require("../../test/utils");
+const { toRole, ether } = require("../../test/utils");
 const { getSavedContractAddresses, saveContractAddress, saveContractAbis } = require('../utils');
 let c = require('../../deployments/deploymentConfig.json');
 
@@ -35,6 +35,8 @@ main = async () => {
   const pBTCMPrice = config.pBTCMPrice;
   const pETHMPrice = config.pETHMPrice;
   const claimIndex = config.claimIndex;
+  const pBTCMSupply = config.pBTCMSupply;
+  const pETHMSupply = config.pETHMSupply;
 
   // Constants
   const MINTER_ROLE = toRole("MINTER_ROLE");
@@ -68,9 +70,9 @@ main = async () => {
   const mineAftifact = await hre.artifacts.readArtifact("MINEToken");
   const mine = await hre.ethers.getContractAt(mineAftifact.abi, contracts["MNET"]);
 
-  const manager = await impersonateAccountAndSetBalance(managerAddress);
-  await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTC, mine.address);
-  await polkaminePoolManager.connect(manager).addPool(pETHM.address, wETH, mine.address);
+  // const manager = await impersonateAccountAndSetBalance(managerAddress);
+  // await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTC, mine.address);
+  // await polkaminePoolManager.connect(manager).addPool(pETHM.address, wETH, mine.address);
 
   
   // Grant roles to PTokens and MINE Token
@@ -85,12 +87,16 @@ main = async () => {
   await tokenSale.setTokenPrice(pBTCM.address, usdtAddress, pBTCMPrice);
   await tokenSale.setTokenPrice(pETHM.address, usdtAddress, pETHMPrice);
 
-  // Set claimIndex
-  const polkamineRewardDistributorAftifact = await hre.artifacts.readArtifact("PolkamineRewardDistributor");
-  const polkamineRewardDistributor = await hre.ethers.getContractAt(polkamineRewardDistributorAftifact.abi, contracts["PolkamineRewardDistributor"]);
+  // Set PToken TotalSupply
+  await tokenSale.setTokenSupplyAmount(pBTCM.address, ether(pBTCMSupply));
+  await tokenSale.setTokenSupplyAmount(pETHM.address, ether(pETHMSupply));
 
-  const maintainer = await impersonateAccountAndSetBalance(maintainerAddress);
-  await polkamineRewardDistributor.connect(maintainer).setClaimIndex(claimIndex);
+  // Set claimIndex
+  // const polkamineRewardDistributorAftifact = await hre.artifacts.readArtifact("PolkamineRewardDistributor");
+  // const polkamineRewardDistributor = await hre.ethers.getContractAt(polkamineRewardDistributorAftifact.abi, contracts["PolkamineRewardDistributor"]);
+
+  // const maintainer = await impersonateAccountAndSetBalance(maintainerAddress);
+  // await polkamineRewardDistributor.connect(maintainer).setClaimIndex(claimIndex);
 };
 
 // We recommend this pattern to be able to use async/await everywhere
