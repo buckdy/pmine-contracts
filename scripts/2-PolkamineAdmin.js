@@ -1,5 +1,5 @@
-const { ethers } = require("ethers");
 const hre = require("hardhat");
+const { ethers, upgrades } = require("hardhat");
 const { getSavedContractAddresses, saveContractAddress, saveContractAbis } = require('./utils');
 let c = require('../deployments/deploymentConfig.json');
 
