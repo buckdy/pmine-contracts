@@ -1,5 +1,5 @@
-const { ethers } = require("ethers");
 const hre = require("hardhat");
+const { ethers, upgrades } = require("hardhat");
 const { toRole } = require("../test/utils");
 const { getSavedContractAddresses, saveContractAddress, saveContractAbis } = require('./utils');
 let c = require('../deployments/deploymentConfig.json');
@@ -24,6 +24,9 @@ main = async () => {
   [deployer] = await ethers.getSigners();
 
   // Register addresses to PolkamineAdmin
+  const polkamineAdminAftifact = await hre.artifacts.readArtifact("PolkamineAdmin");
+  const polkamineAdmin = await hre.ethers.getContractAt(polkamineAdminAftifact.abi, contracts["PolkamineAdmin"]);
+
   await polkamineAdmin.setRewardDepositor(rewardDepositorAddress);
   await polkamineAdmin.setMaintainer(maintainerAddress);
   await polkamineAdmin.setTreasury(treasuryAddress);
@@ -34,11 +37,11 @@ main = async () => {
   const wBTC = config.wBTC;
   const wETH = config.wETH;
 
-  const polkaminePoolManagerArtifact = await hre.artifacts.readArtifact("PolkamnePoolManager");
-  const polkaminePoolManager = await hre.ethers.getContractAt(polkaminePoolManagerArtifact.abi, contracts["PolkamnePoolManager"]);
+  const polkaminePoolManagerArtifact = await hre.artifacts.readArtifact("PolkaminePoolManager");
+  const polkaminePoolManager = await hre.ethers.getContractAt(polkaminePoolManagerArtifact.abi, contracts["PolkaminePoolManager"]);
 
-  await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTC, mine.address);
-  await polkaminePoolManager.connect(manager).addPool(pETHM.address, wETH, mine.address);
+  // await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTC, mine.address);
+  // await polkaminePoolManager.connect(manager).addPool(pETHM.address, wETH, mine.address);
 
   
   // Grant roles to PTokens and MINE Token
@@ -61,6 +64,10 @@ main = async () => {
 
   await tokenSale.setTokenPrice(pBTCM.address, usdtAddress, pBTCMPrice);
   await tokenSale.setTokenPrice(pETHM.address, usdtAddress, pETHMPrice);
+
+  // Set PToken TotalSupply
+  await tokenSale.setTokenSupplyAmount(pBTCM.address, ether(pBTCMSupply));
+  await tokenSale.setTokenSupplyAmount(pETHM.address, ether(pETHMSupply));
 
   // // Set claimIndex
   // await polkamineRewardDistributor.connect(maintainer).setClaimIndex(claimIndex);
