@@ -71,8 +71,8 @@ main = async () => {
   const mine = await hre.ethers.getContractAt(mineAftifact.abi, contracts["MNET"]);
 
   // const manager = await impersonateAccountAndSetBalance(managerAddress);
-  // await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTC, mine.address);
-  // await polkaminePoolManager.connect(manager).addPool(pETHM.address, wETH, mine.address);
+  // await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTC.address, mine.address);
+  // await polkaminePoolManager.connect(manager).addPool(pETHM.address, wETH.address, mine.address);
 
   
   // Grant roles to PTokens and MINE Token

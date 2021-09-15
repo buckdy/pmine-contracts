@@ -40,8 +40,8 @@ main = async () => {
   const polkaminePoolManagerArtifact = await hre.artifacts.readArtifact("PolkaminePoolManager");
   const polkaminePoolManager = await hre.ethers.getContractAt(polkaminePoolManagerArtifact.abi, contracts["PolkaminePoolManager"]);
 
-  // await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTC, mine.address);
-  // await polkaminePoolManager.connect(manager).addPool(pETHM.address, wETH, mine.address);
+  // await polkaminePoolManager.connect(manager).addPool(pBTCM.address, wBTC.address, mine.address);
+  // await polkaminePoolManager.connect(manager).addPool(pETHM.address, wETH.address, mine.address);
 
   
   // Grant roles to PTokens and MINE Token
