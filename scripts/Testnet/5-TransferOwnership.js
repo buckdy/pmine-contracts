@@ -30,10 +30,13 @@ main = async () => {
   const defaultAdminRole = await pBTCM.DEFAULT_ADMIN_ROLE();
 
   await pBTCM.grantRole(defaultAdminRole, ownerAddress);
-  await pBTCM.revokeRole(defaultAdminRole, deployer.address);
+  // await pBTCM.revokeRole(defaultAdminRole, deployer.address);
+
+  await pETHM.grantRole(defaultAdminRole, ownerAddress);
+  // await pETHM.revokeRole(defaultAdminRole, deployer.address);
 
   await mine.grantRole(defaultAdminRole, ownerAddress);
-  await mine.revokeRole(defaultAdminRole, deployer.address);
+  // await mine.revokeRole(defaultAdminRole, deployer.address);
 
   // PolkamineAdmin
   const polkamineAdminAftifact = await hre.artifacts.readArtifact("PolkamineAdmin");
