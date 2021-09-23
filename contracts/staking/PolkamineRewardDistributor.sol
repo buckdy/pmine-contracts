@@ -123,8 +123,8 @@ contract PolkamineRewardDistributor is IPolkamineRewardDistributor, ReentrancyGu
 
     // check rewardToken and doubleRewardToken
     (, address rewardToken, address doubleRewardToken) = IPolkaminePoolManager(poolManager).pools(_pid);
-    require(rewardToken == _rewardToken, "Unmatched reward token");
-    require(doubleRewardToken == _doubleRewardToken, "Unmatched double reward token");
+    require(rewardToken == _rewardToken, "Mismatched reward token");
+    require(doubleRewardToken == _doubleRewardToken, "Mismatched double reward token");
 
     // transfer reward and double reward
     require(IERC20Upgradeable(rewardToken).transfer(msg.sender, _amount), "Transfer failure");

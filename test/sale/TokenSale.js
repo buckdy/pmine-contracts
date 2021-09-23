@@ -167,7 +167,7 @@ describe("TokenSale", () => {
       );
     });
 
-    it("Should not purchase tokens if depositToken is unmatched", async () => {
+    it("Should not purchase tokens if depositToken is mismatched", async () => {
       // set token price
       let depositTokenAmount = 100;
       await tokenSale.connect(manager).setTokenPrice(pBTCM.address, depositToken.address, depositTokenAmount);

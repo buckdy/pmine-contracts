@@ -689,7 +689,7 @@ describe("PolkamineRewardDistributor", () => {
       ).to.be.revertedWith("Invalid pid");
     });
 
-    it("Should not claim rewards with unmatched reward token", async () => {
+    it("Should not claim rewards with mismatched reward token", async () => {
       // deposit first rewards
       let wBTCOTotalRewardFirst = 50,
         wETHOTotalRewardFirst = 20,
@@ -729,12 +729,12 @@ describe("PolkamineRewardDistributor", () => {
         polkamineRewardDistributor
           .connect(alice)
           .claim(pidPBTCM, wETHO.address, 60, mine.address, 60, claimIndex, signatureAliceBTC),
-      ).to.be.revertedWith("Unmatched reward token");
+      ).to.be.revertedWith("Mismatched reward token");
       await expect(
         polkamineRewardDistributor
           .connect(bob)
           .claim(pidPETHM, wBTCO.address, 30, mine.address, 30, claimIndex, signatureBobETH),
-      ).to.be.revertedWith("Unmatched reward token");
+      ).to.be.revertedWith("Mismatched reward token");
     });
 
     it("Should not claim rewards with the exceeded amount", async () => {
