@@ -1,7 +1,5 @@
 node_modules
 package-lock.json
-package.lock
-yarn.lock
 .vscode
 
 #Hardhat files
