@@ -124,6 +124,51 @@
       "address": "0x7e5b3ECc6978150543efa3527A5F4a9D1485AAbE",
       "txHash": "0x9a6af91321c0f0f3967163cbf3aa60ad50068582741a6e01db2e6b344286aa93",
       "kind": "transparent"
+    },
+    {
+      "address": "0x46ebD27045C4aC92C043c8563Ae5b417B2862C4C",
+      "txHash": "0x73825ebc3e61044a2ff80f7ab3817122a52b9286c57e689ca3c72a6af018dcfc",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xB47e1E5b6F05d927933Bc11aD40d263EEcCC4688",
+      "txHash": "0x5b6b33a77aa7158440ed46365d22e59e488e1f25c85021094be0aa9ff9ba5b6b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x69fF9FB883d1a869E93Dac985CE07acE681F2EfF",
+      "txHash": "0x82e14985d4009bd8962e41082ac3767a5f7d5b33e7ecb39f7610f4c16c141ab7",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x2ecC884d3933E6281BFC1648A4058862933431D0",
+      "txHash": "0xdf5c6ca9cb6e466ab97c40f767701db78f6fe1ff3b56e2660744a27cfd73e5da",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xBF39701B03ECF2CF7d307B2967DfB51bAbA0C6f0",
+      "txHash": "0xaae96adf20da9547f9a505bf03f9653991babe2ed5ee7159e98449fc25b2d154",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x62a56488cEE37cD3Ff0AD8bc592db9Bcaa436396",
+      "txHash": "0x5151553d7943ba8fe909c687d6beff50fe2d7ebf4c7ff7d3a00de767577f04ae",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x05634C751b9685F400cCBB9122941703c51Fcc36",
+      "txHash": "0xef83f891a8ccab81b72339f4c52767b153ae538b97f2eaccbf30a48939ec11ce",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x324076AAccfefAb7B8eCEefaA650C8f629CF1f86",
+      "txHash": "0xae91896daf265b06a43959db1a6568f5b94736705184e0d7125c4e759d9c0a33",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xb05Eb717F85d9E03A601F2DaF911AE8bE8344271",
+      "txHash": "0x4dd14bf9cdbbd629d41c0a3ae2aa5f92837396dc8592b0f40bdfecf76f859e94",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -568,40 +613,40 @@
             "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:77"
           },
           {
-            "contract": "PolkamineAdmin",
+            "contract": "MineNetworkAdmin",
             "label": "manager",
             "type": "t_address",
-            "src": "contracts/staking/PolkamineAdmin.sol:15"
+            "src": "contracts/staking/MineNetworkAdmin.sol:15"
           },
           {
-            "contract": "PolkamineAdmin",
+            "contract": "MineNetworkAdmin",
             "label": "rewardDepositor",
             "type": "t_address",
-            "src": "contracts/staking/PolkamineAdmin.sol:16"
+            "src": "contracts/staking/MineNetworkAdmin.sol:16"
           },
           {
-            "contract": "PolkamineAdmin",
+            "contract": "MineNetworkAdmin",
             "label": "maintainer",
             "type": "t_address",
-            "src": "contracts/staking/PolkamineAdmin.sol:17"
+            "src": "contracts/staking/MineNetworkAdmin.sol:17"
           },
           {
-            "contract": "PolkamineAdmin",
+            "contract": "MineNetworkAdmin",
             "label": "treasury",
             "type": "t_address",
-            "src": "contracts/staking/PolkamineAdmin.sol:18"
+            "src": "contracts/staking/MineNetworkAdmin.sol:18"
           },
           {
-            "contract": "PolkamineAdmin",
+            "contract": "MineNetworkAdmin",
             "label": "rewardDistributorContract",
             "type": "t_address",
-            "src": "contracts/staking/PolkamineAdmin.sol:21"
+            "src": "contracts/staking/MineNetworkAdmin.sol:21"
           },
           {
-            "contract": "PolkamineAdmin",
+            "contract": "MineNetworkAdmin",
             "label": "poolManagerContract",
             "type": "t_address",
-            "src": "contracts/staking/PolkamineAdmin.sol:22"
+            "src": "contracts/staking/MineNetworkAdmin.sol:22"
           }
         ],
         "types": {
@@ -653,34 +698,34 @@
             "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:67"
           },
           {
-            "contract": "PolkaminePoolManager",
+            "contract": "MineNetworkPoolManager",
             "label": "addressManager",
             "type": "t_address",
-            "src": "contracts/staking/PolkaminePoolManager.sol:32"
+            "src": "contracts/staking/MineNetworkPoolManager.sol:32"
           },
           {
-            "contract": "PolkaminePoolManager",
+            "contract": "MineNetworkPoolManager",
             "label": "pools",
             "type": "t_array(t_struct(PoolInfo)3664_storage)dyn_storage",
-            "src": "contracts/staking/PolkaminePoolManager.sol:33"
+            "src": "contracts/staking/MineNetworkPoolManager.sol:33"
           },
           {
-            "contract": "PolkaminePoolManager",
+            "contract": "MineNetworkPoolManager",
             "label": "userStakes",
             "type": "t_mapping(t_uint256,t_mapping(t_address,t_uint256))",
-            "src": "contracts/staking/PolkaminePoolManager.sol:34"
+            "src": "contracts/staking/MineNetworkPoolManager.sol:34"
           },
           {
-            "contract": "PolkaminePoolManager",
+            "contract": "MineNetworkPoolManager",
             "label": "poolStakes",
             "type": "t_mapping(t_uint256,t_uint256)",
-            "src": "contracts/staking/PolkaminePoolManager.sol:35"
+            "src": "contracts/staking/MineNetworkPoolManager.sol:35"
           },
           {
-            "contract": "PolkaminePoolManager",
+            "contract": "MineNetworkPoolManager",
             "label": "isDeprecatedPool",
             "type": "t_mapping(t_uint256,t_bool)",
-            "src": "contracts/staking/PolkaminePoolManager.sol:36"
+            "src": "contracts/staking/MineNetworkPoolManager.sol:36"
           }
         ],
         "types": {
@@ -688,10 +733,10 @@
             "label": "address"
           },
           "t_array(t_struct(PoolInfo)3664_storage)dyn_storage": {
-            "label": "struct PolkaminePoolManager.PoolInfo[]"
+            "label": "struct MineNetworkPoolManager.PoolInfo[]"
           },
           "t_struct(PoolInfo)3664_storage": {
-            "label": "struct PolkaminePoolManager.PoolInfo",
+            "label": "struct MineNetworkPoolManager.PoolInfo",
             "members": [
               {
                 "label": "depositToken",
@@ -761,34 +806,34 @@
             "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:67"
           },
           {
-            "contract": "PolkamineRewardDistributor",
+            "contract": "MineNetworkRewardDistributor",
             "label": "addressManager",
             "type": "t_address",
-            "src": "contracts/staking/PolkamineRewardDistributor.sol:37"
+            "src": "contracts/staking/MineNetworkRewardDistributor.sol:37"
           },
           {
-            "contract": "PolkamineRewardDistributor",
+            "contract": "MineNetworkRewardDistributor",
             "label": "userLastClaimedAt",
             "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
-            "src": "contracts/staking/PolkamineRewardDistributor.sol:38"
+            "src": "contracts/staking/MineNetworkRewardDistributor.sol:38"
           },
           {
-            "contract": "PolkamineRewardDistributor",
+            "contract": "MineNetworkRewardDistributor",
             "label": "claimInterval",
             "type": "t_uint256",
-            "src": "contracts/staking/PolkamineRewardDistributor.sol:39"
+            "src": "contracts/staking/MineNetworkRewardDistributor.sol:39"
           },
           {
-            "contract": "PolkamineRewardDistributor",
+            "contract": "MineNetworkRewardDistributor",
             "label": "claimIndex",
             "type": "t_uint256",
-            "src": "contracts/staking/PolkamineRewardDistributor.sol:40"
+            "src": "contracts/staking/MineNetworkRewardDistributor.sol:40"
           },
           {
-            "contract": "PolkamineRewardDistributor",
+            "contract": "MineNetworkRewardDistributor",
             "label": "isUsedSignature",
             "type": "t_mapping(t_bytes_memory_ptr,t_bool)",
-            "src": "contracts/staking/PolkamineRewardDistributor.sol:41"
+            "src": "contracts/staking/MineNetworkRewardDistributor.sol:41"
           }
         ],
         "types": {
@@ -822,6 +867,388 @@
     "34a76286a177eb2e5bc82f021618dce8dfd0b0ad631dafb71668ccc144f9e0c2": {
       "address": "0x7DA0e022fB1144c631A650053D534aA2CA2c61c0",
       "txHash": "0xd23d3e18080375d60bc58c6a06a386909d62a20a5be2064b6ee555226c95f5f3",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:26"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "TokenSale",
+            "label": "tokenPrice",
+            "type": "t_mapping(t_address,t_struct(PurchaseInfo)3243_storage)",
+            "src": "contracts/sale/TokenSale.sol:39"
+          },
+          {
+            "contract": "TokenSale",
+            "label": "tokenSupplyAmount",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/sale/TokenSale.sol:40"
+          },
+          {
+            "contract": "TokenSale",
+            "label": "addressManager",
+            "type": "t_address",
+            "src": "contracts/sale/TokenSale.sol:41"
+          }
+        ],
+        "types": {
+          "t_mapping(t_address,t_struct(PurchaseInfo)3243_storage)": {
+            "label": "mapping(address => struct TokenSale.PurchaseInfo)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_struct(PurchaseInfo)3243_storage": {
+            "label": "struct TokenSale.PurchaseInfo",
+            "members": [
+              {
+                "label": "depositTokenAddress",
+                "type": "t_address"
+              },
+              {
+                "label": "depositTokenAmount",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "3b9994b44892b9f7c959f375300c0036c02e8325c35c5921b6589f67a3c7115a": {
+      "address": "0xb81CfbF349aF902De47f38156CF87172015101D5",
+      "txHash": "0xc05162bf96a661669639cb80faa72848a9429587388ba962cad87163fed985d2",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:26"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:30"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:28"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:96"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:21"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:77"
+          },
+          {
+            "contract": "MineNetworkAdmin",
+            "label": "manager",
+            "type": "t_address",
+            "src": "contracts/staking/MineNetworkAdmin.sol:15"
+          },
+          {
+            "contract": "MineNetworkAdmin",
+            "label": "rewardDepositor",
+            "type": "t_address",
+            "src": "contracts/staking/MineNetworkAdmin.sol:16"
+          },
+          {
+            "contract": "MineNetworkAdmin",
+            "label": "maintainer",
+            "type": "t_address",
+            "src": "contracts/staking/MineNetworkAdmin.sol:17"
+          },
+          {
+            "contract": "MineNetworkAdmin",
+            "label": "treasury",
+            "type": "t_address",
+            "src": "contracts/staking/MineNetworkAdmin.sol:18"
+          },
+          {
+            "contract": "MineNetworkAdmin",
+            "label": "rewardDistributorContract",
+            "type": "t_address",
+            "src": "contracts/staking/MineNetworkAdmin.sol:21"
+          },
+          {
+            "contract": "MineNetworkAdmin",
+            "label": "poolManagerContract",
+            "type": "t_address",
+            "src": "contracts/staking/MineNetworkAdmin.sol:22"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "af0f34d7b6841bdcca05938dee31e210e4b29fff59d6d8711a2a54e68a3313d1": {
+      "address": "0xf698675f793071eBc0D95428284BD2abf9699523",
+      "txHash": "0x8a32b8fc3edc8359985ee61d4e5fbd281ba90dd1ff38ee910d1824801856f7c1",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:26"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "MineNetworkPoolManager",
+            "label": "addressManager",
+            "type": "t_address",
+            "src": "contracts/staking/MineNetworkPoolManager.sol:32"
+          },
+          {
+            "contract": "MineNetworkPoolManager",
+            "label": "pools",
+            "type": "t_array(t_struct(PoolInfo)3664_storage)dyn_storage",
+            "src": "contracts/staking/MineNetworkPoolManager.sol:33"
+          },
+          {
+            "contract": "MineNetworkPoolManager",
+            "label": "userStakes",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_uint256))",
+            "src": "contracts/staking/MineNetworkPoolManager.sol:34"
+          },
+          {
+            "contract": "MineNetworkPoolManager",
+            "label": "poolStakes",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/staking/MineNetworkPoolManager.sol:35"
+          },
+          {
+            "contract": "MineNetworkPoolManager",
+            "label": "isDeprecatedPool",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "src": "contracts/staking/MineNetworkPoolManager.sol:36"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_struct(PoolInfo)3664_storage)dyn_storage": {
+            "label": "struct MineNetworkPoolManager.PoolInfo[]"
+          },
+          "t_struct(PoolInfo)3664_storage": {
+            "label": "struct MineNetworkPoolManager.PoolInfo",
+            "members": [
+              {
+                "label": "depositToken",
+                "type": "t_address"
+              },
+              {
+                "label": "rewardToken",
+                "type": "t_address"
+              },
+              {
+                "label": "doubleRewardToken",
+                "type": "t_address"
+              }
+            ]
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(uint256 => mapping(address => uint256))"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          }
+        }
+      }
+    },
+    "2106e737b9170ff8540fe9fb52f7a4bfccdaf5e08c1918aa2508c88d3d99e04c": {
+      "address": "0xFf3dCa5d73407859754D6466e3FECB6317A97995",
+      "txHash": "0x8ae89175389a2d310f2a2005e404317e2eb93af3387ff324f811f7408dab892b",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:26"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "MineNetworkRewardDistributor",
+            "label": "addressManager",
+            "type": "t_address",
+            "src": "contracts/staking/MineNetworkRewardDistributor.sol:37"
+          },
+          {
+            "contract": "MineNetworkRewardDistributor",
+            "label": "userLastClaimedAt",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+            "src": "contracts/staking/MineNetworkRewardDistributor.sol:38"
+          },
+          {
+            "contract": "MineNetworkRewardDistributor",
+            "label": "claimInterval",
+            "type": "t_uint256",
+            "src": "contracts/staking/MineNetworkRewardDistributor.sol:39"
+          },
+          {
+            "contract": "MineNetworkRewardDistributor",
+            "label": "claimIndex",
+            "type": "t_uint256",
+            "src": "contracts/staking/MineNetworkRewardDistributor.sol:40"
+          },
+          {
+            "contract": "MineNetworkRewardDistributor",
+            "label": "isUsedSignature",
+            "type": "t_mapping(t_bytes_memory_ptr,t_bool)",
+            "src": "contracts/staking/MineNetworkRewardDistributor.sol:41"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+            "label": "mapping(address => mapping(uint256 => uint256))"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_bytes_memory_ptr,t_bool)": {
+            "label": "mapping(bytes => bool)"
+          },
+          "t_bytes_storage": {
+            "label": "bytes"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          }
+        }
+      }
+    },
+    "696936fcb44009ee8d107f67af6afc7e4ffb6a12ba6ac7936a27bb0368f5b180": {
+      "address": "0xFF7cb8b8FE715141F36e36d92fcdb3aE618eb5ce",
+      "txHash": "0x95c54e49b53343bd1d6e27c5726cbef2305c0aed9f4dac81e9a9e71e15375ec7",
       "layout": {
         "storage": [
           {
